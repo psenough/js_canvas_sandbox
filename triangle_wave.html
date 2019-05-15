@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+ <head>
+ 	<title>Montemor</title>
+	<meta charset="UTF-8">
+ 	<style>
+
+@font-face {
+	font-family: 'PMarker';
+	src: url('fonts/PermanentMarker.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {
+	overflow: hidden;
+	padding: 0px;
+	margin: 0px;
+}
+
+.aligncenter {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	text-align: center;
+	margin: auto;
+}
+
+#message {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	font-family: 'PMarker';
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	margin: auto;
+	text-align: center;
+	font-size: 35px;
+	overflow-y: hidden;
+	text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+	line-height: 2em;
+}
+
+#message span {
+	position: relative;
+	top: 35%;
+	transform: translateY(-50%);
+}
+
+@-webkit-keyframes fade-in {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.fade-in {
+	opacity: 0;
+	-webkit-animation-name: fade-in;
+	-webkit-animation-duration: 6s;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-iteration-count: 2;
+	-webkit-animation-direction: alternate;
+}
+
+ 	</style>
+	<script src="requestanimationframe.js"></script>
+  	<script type="application/javascript">
+
+rand = function(n){
+	return Math.floor(Math.random()*n);
+};
+
+var rms = 0;
+
+var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
+//var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
+//var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
+var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+//var is_opera = navigator.userAgent.indexOf("Presto") > -1;
+if ((is_chrome)&&(is_safari)) {is_safari=false;}
+
+var analyser;
+var bufferLength;
+var dataArray;
+				
+function init() {
+	    
+	var context;
+	
+	try {
+		// Fix up for prefixing
+		window.AudioContext = window.AudioContext||window.webkitAudioContext;
+		context = new AudioContext();
+
+		var request = new XMLHttpRequest();
+		//if (is_safari) request.open('GET', 'esem_gre_ii.m4a', true);
+		//	else request.open('GET', 'esem_gre_ii.ogg', true);		
+		if (is_safari) request.open('GET', 'audio/montemor04_151028.m4a', true);
+			else request.open('GET', 'audio/montemor04_151028.ogg', true);
+		request.responseType = 'arraybuffer';
+		console.log('requesting');
+
+		// Decode asynchronously
+		request.onload = function() {
+			context.decodeAudioData(request.response, function(buffer) {
+	  
+				backgroundAudio = context.createBufferSource(); 	// creates a sound source
+				backgroundAudio.buffer = buffer;                    // tell the source which sound to play
+				backgroundAudio.connect(context.destination);       // connect the source to the context's destination (the speakers)
+				backgroundAudio.loop = true;
+				backgroundAudio.start(0);
+				
+				analyser = context.createAnalyser();
+				analyser.fftSize = 256;
+				bufferLength = analyser.fftSize;
+				dataArray = new Uint8Array(bufferLength);
+				analyser.getByteTimeDomainData(dataArray);
+				backgroundAudio.connect(analyser);
+				analyser.connect(context.destination);
+				
+				//var levelChecker = context.createScriptProcessor(1024, 2, 2);
+				//backgroundAudio.connect(levelChecker);
+				//levelChecker.connect(context.destination);
+				//console.log('connecting');
+
+				//levelChecker.onaudioprocess = process;
+			
+				// start canvas
+				drawCanvas();
+	  
+				console.log('decoded');
+
+	  
+			}, function(evt) {
+				console.log('failed to load buffer');
+				console.log(evt);
+			});
+		}
+		request.send();
+
+	} catch(e) {
+		console.log('Web Audio API is not supported in this browser');
+		drawCanvas();
+	}
+
+}
+var buffer;
+
+var process = function(e) {
+	buffer = e.inputBuffer.getChannelData(0);
+	var len = buffer.length; 
+	var total = 0;
+	var i = 0;
+	
+	freq1 = Math.abs(buffer[parseInt(len*0.015,10)]*2.0);
+	freq2 = Math.abs(buffer[parseInt(len*0.1,10)]*2.0);
+
+	while ( i < len ) total += Math.abs( buffer[i++] );
+	
+	rms = (rms + Math.sqrt( total / len )) * 0.5;
+}
+
+var freq1 = 0.0;
+var freq2 = 0.0;
+
+var w;
+var h;
+var centerX;
+var centerY;
+var ctx;
+var oangle;
+
+var fps = 0;
+var framecounter = false;
+var fpsFilter = 60;
+
+var scene = 3;
+var starttime;
+
+
+function drawCanvas() {
+
+	resize();
+
+	var num = 45;
+	var mul = 2;
+	var mult = 1;
+	var angle = (Math.PI*2)/num;
+	var size = 60;
+	var opening, phase1, phase2;
+	var maxj = 10;
+	
+	
+	function drawScene() {
+		var d = new Date();
+		var timer = d.getTime();
+		
+		if (framecounter) {
+			var thisFrameFPS = 1000 / (timer - lastUpdate);
+			if (timer!=lastUpdate){
+				fps += (thisFrameFPS - fps) / fpsFilter;
+				lastUpdate = timer;
+			}
+		}
+		
+		phase1 = timer/25000;
+		phase2 = timer/2500;
+		
+		var flick1 = Math.abs(parseInt((2*freq1),10));
+		var flick2 = Math.abs(parseInt((4*freq1),10));
+		
+		
+		var size = w/num;
+		var halfsize = size*0.5;
+		mult = (1.5 + Math.sin(phase2));
+	
+		/*ctx.save();
+		ctx.beginPath();
+		ctx.moveTo(100,100);
+		ctx.lineTo(400,100);
+		ctx.lineTo(400,400);
+		ctx.closePath();
+		//ctx.clip();
+		*/
+		//console.log(flick2);
+		for (var thisx=0; thisx<w; thisx += size) {
+			for (var thisy=0; thisy<h; thisy += size) {
+
+				var value1 = parseInt( Math.abs( Math.sin(thisx - thisy + Math.sin(thisx+rms)*10 % w )*50 ),10);
+				
+				color = "rgba("+(100+value1)+","+value1+","+value1+",0.5)";
+				ctx.fillStyle = color;
+				var tsize = halfsize + Math.sin(phase2 + thisx + thisy)*halfsize*mult;
+				ctx.beginPath();
+				ctx.moveTo(thisx,thisy);
+				if (Math.random()*flick2>2.9) {
+					ctx.lineTo(thisx-tsize,thisy);
+					ctx.lineTo(thisx-tsize,thisy-tsize);
+				} else {
+					ctx.lineTo(thisx+tsize,thisy);
+					ctx.lineTo(thisx+tsize,thisy+tsize);
+				}
+					
+				ctx.fill();
+	
+			}
+		}
+		//ctx.restore();
+		
+	}
+	
+	function drawSpectrum() {
+	
+		analyser.getByteTimeDomainData(dataArray);
+		
+		for(var i = 0; i < bufferLength; i++) {
+
+		//for (var freq=0; freq < buffer.length; freq++) {		
+			var v = dataArray[i];// / 128.0;		
+			if (i == 1) console.log(v);
+			color = "rgba(0,0,0,0.75)";
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(i*4+0,h-v*h);
+			ctx.lineTo(i*4+2,h-v*h);
+			ctx.lineTo(i*4+2,h);
+			ctx.lineTo(i*4+0,h);
+			ctx.fill();
+		}
+	}
+
+	//
+	// start demo
+	//
+	
+	requestAnimationFrame( animate );
+	document.getElementById('message').innerHTML = '';
+	setTimeout("startText()",2000);
+
+	var d = new Date();
+	var n = d.getTime();
+	var lastUpdate = d.getTime();
+	starttime = lastUpdate;
+
+	function animate() {
+		requestAnimationFrame( animate );
+		ctx.clearRect(0,0,w,h);
+		
+		ctx.rect(0, 0, w, h);
+		var grd = ctx.createLinearGradient(0, 0, 0, h);
+		grd.addColorStop(0, '#aaa');
+		grd.addColorStop(1, '#555');
+		ctx.fillStyle = grd;
+		ctx.fill();
+	  
+		drawScene();
+		
+		//drawSpectrum();
+	}
+}
+
+window.onresize = resize;
+
+function resize() {
+	w = window.innerWidth;
+	h = window.innerHeight;
+	
+	var canvas = document.getElementById("canvas");
+	canvas.setAttribute("width", w);
+	canvas.setAttribute("height", h);
+	
+	ctx = canvas.getContext("2d");
+	ctx.width = w;
+	ctx.height = h;
+	
+	centerX = w*(0.5);
+	centerY = h*(0.5);
+	oangle = Math.asin( centerX / Math.sqrt(centerX*centerX+centerY*centerY) ) * 2;
+}
+
+if (framecounter) {
+	setInterval(function(){
+		var fpsOut = document.getElementById('fps');
+		if (fpsOut) fpsOut.innerHTML = fps.toFixed(1);
+	}, 1000);
+}
+
+function startText() {
+	console.log('started text');
+	loadFirstScreen();
+	var timerloop = 8;
+	//setTimeout("loadSecondScreen()",timerloop*1000);	
+	//setTimeout("loadThirdScreen()",timerloop*2000); 	
+	//setTimeout("loadFourthScreen()",timerloop*3000);
+	//setTimeout("startText()",timerloop*4000);
+}
+
+function loadFirstScreen() {
+  	var content = '';
+	thisclass = '';
+	if (is_chrome) thisclass='class="fade-in"';
+ 	content += '<span '+thisclass+'>hello helsinki demoscene</span><br />';
+ 	content += '<span '+thisclass+'>just to inform you that ps and truck</span><br />';
+ 	content += '<span '+thisclass+'>are having a couple of beers today</span>';
+ 	document.getElementById('message').innerHTML = content;
+}
+
+function loadSecondScreen() {
+  	var content = '';
+ 	content += '<span '+thisclass+'>meeting point is sornainens williamk</span><br />';
+ 	content += '<span '+thisclass+'>around 16:00</span><br />';
+ 	content += '<span '+thisclass+'>Sunday 18 January 2015</span><br />';
+ 	document.getElementById('message').innerHTML = content;
+}
+
+function loadThirdScreen() {
+  	var content = '';
+ 	content += '<span '+thisclass+'>feel free to join us</span><br />';
+ 	content += '<span '+thisclass+'>greetings to accession only!</span><br />';
+ 	content += '<span '+thisclass+'>fuckings to lamers!</span>';
+ 	document.getElementById('message').innerHTML = content;
+}
+
+function loadFourthScreen() {
+  	var content = '';
+ 	content += '<span '+thisclass+'>music by azureflux</span><br />';
+ 	content += '<span '+thisclass+'>code by ps</span><br />';
+ 	content += '<span '+thisclass+'>(looping...)</span>';
+ 	document.getElementById('message').innerHTML = content;
+}
+
+function loadFifthScreen() {
+  	var content = '';
+ 	content += '<span '+thisclass+'>codigo de ps / TPOLM</span><br />';
+ 	content += '<span '+thisclass+'>musica ripada de Giorgio Moroder</span><br />';
+ 	content += '<span '+thisclass+'></span><br />';
+ 	document.getElementById('message').innerHTML = content;
+}
+
+document.onkeyup = function(event) {
+    console.log(event.keyCode);
+    switch(event.keyCode) {
+    	case 49: //1
+    		scene = 0;
+    	break;
+    	case 50: //2
+    		scene = 1;
+    	break;
+    	case 51: //3
+    		scene = 2;
+    	break;
+    	case 52: //4
+    		scene = 3;
+    	break;
+    	case 53: //5
+    		scene = 4;
+    	break;
+    	case 54: // 6
+    		scene = 5;
+    	break;
+    	case 55: //7
+    		scene = 6;
+    	break;
+    }
+};
+
+  </script>
+ </head>
+ <body onload="init()">
+ 	<div class="aligncenter">
+   		<canvas id="canvas" width="800" height="600"></canvas>
+   		<div id="message">loading...</div>
+   	</div>
+   	<div id="fps"></div>
+ </body>
+</html>

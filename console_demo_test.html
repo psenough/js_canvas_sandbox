@@ -1,0 +1,82 @@
+<html>
+<head>
+</head>
+<script>
+
+rand = function(n){
+	return Math.floor(Math.random()*n);
+};
+
+function drawCanvas() {
+	
+	var ellapsed = 0;
+	
+	function drawThis() {
+		
+		var d2 = new Date();
+		var n2 = d2.getTime(); 
+		ellapsed = n2 - n;
+		
+		//console.log(ellapsed);
+		draw_console_anim();
+		
+	}
+	
+	//requestAnimationFrame( animate );
+	setTimeout(animate, 50);
+	
+	var d = new Date();
+	var n = d.getTime();
+
+	var lines = 10;
+	var columns = 50;
+	var size = lines*columns;
+	function draw_console_anim(seed) {
+		var string = '';
+		for (var i=0; i<size; i++) {
+			string += '%cO';
+			if (i%columns == columns-1) string += '\\n';
+		}
+
+		var exec_string = 'console.log("'+ ellapsed + '\\n' + string+'"';
+		for (var j=0; j<size; j++) {
+			var bg = 'color:yellow; background-color:blue';
+			if (j%2 == (Math.sin(ellapsed)>0.0)) bg = 'color: blue; background-color:yellow';
+			exec_string += ',"'+bg+'"';
+		}
+		exec_string += ')';
+		//console.log(exec_string);
+
+		var dom = document.getElementById('output');
+		//console.log(dom);
+		if (dom) {
+			//console.log('vbanan');
+			dom.innerHTML = exec_string;
+		}
+		eval(exec_string);
+	}
+	
+	function animate() {
+		//requestAnimationFrame( animate );
+		setTimeout(animate, 50);
+		//console.clear();
+		drawThis();
+	}
+}
+
+
+function init() {
+	drawCanvas();
+}
+//window.onload = demo();
+
+</script>
+<body onload="init()">
+	<div>
+	<a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers</a>
+	</div>
+	<br>
+	<div id="output">
+	</div>
+</body>
+</html>
