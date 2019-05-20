@@ -51,8 +51,69 @@ c.style.background = "transparent";
         };
 }());
 
+var img_dir = 'gfx/';
+var img_ref = [];
+
+function ImageLoader(Images, Callback){
+    // Keep the count of the verified images
+    var allLoaded = 0;
+
+    // The object that will be returned in the callback
+    var _log = {
+        success: [],
+        error: []
+    };
+
+    // Executed everytime an img is successfully or wrong loaded
+    var verifier = function(){
+        allLoaded++;
+
+        // triggers the end callback when all images has been tested
+        if(allLoaded == Images.length){
+			//console.log(_log);
+            Callback.call(undefined, _log);
+        }
+    };
+
+    // Loop through all the images URLs
+    for (var index = 0; index < Images.length; index++) {
+        // Prevent that index has the same value by wrapping it inside an anonymous fn
+        (function(i){
+            // Image path providen in the array e.g image.png
+            var imgSource = Images[i];
+            var img = new Image();
+            
+            img.addEventListener("load", function(){
+                _log.success.push(imgSource);
+                verifier();
+            }, false); 
+            
+            img.addEventListener("error", function(err){
+                _log.error.push(imgSource);
+                verifier();
+            }, false); 
+           //console.log(img_dir + imgSource);
+            img.src = img_dir + imgSource;
+			
+			img_ref.push(img);
+        })(index);
+    }
+}
+
 b.onload = function() {
-	loadBackgroundImage( '6a8c475c1ca295ce2ea124fd5cf30ceeaa31ae30.jpg', drawCanvas);
+	
+	ImageLoader(["6a8c475c1ca295ce2ea124fd5cf30ceeaa31ae30.jpg", "51fd74aa826ee476acdcfa9ec197080a20301d9f.jpg", "80e0f8fd0b4eb67a1ce295b578dc3957bb62056c.jpg", "871846d2bd4ad184a5a57bc4f8130e770e89765b.jpg"],
+		function(result){
+			if(result.error.length != 0){
+				// outputs: ["example.png", "example.jpg"]
+				console.log("The following images couldn't be properly loaded: ", result.error);
+			}
+
+			// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
+			console.log("The following images were succesfully loaded: ", result.success);
+			drawCanvas();
+	});
+	
 }
 
 var w;
@@ -61,13 +122,12 @@ var ctx;
 var values = [];
 
 var tc = ['rgba(164,36,59,1)', 'rgba(216, 201, 155, 1)', 'rgba(216, 151, 160, 1)', 'rgba(189, 99, 47, 1)', 'rgba(39, 62, 71, 1)'];
-var bg_img;
 var img_dir = 'gfx/';
-function loadBackgroundImage(image_filename, cb) {
+/*function loadBackgroundImage(image_filename, cb) {
 	bg_img = new Image();
 	bg_img.onload = cb;
 	bg_img.src = img_dir + image_filename;
-}
+}*/
 function drawCanvas() {
 
 	resize();
@@ -103,10 +163,12 @@ function drawCanvas() {
 	var bgcolor = 'rgba(0,0,0,1.0)';
 	
 	var init_time = (new Date()).getTime();
+	//console.log(img_ref);
+	var bg_img = img_ref[2];
 	
 	function drawThis(milis) {
 		
-		let split = '100000001110'; //params['split_data']['value']);
+		let split = '100100001110'; //params['split_data']['value']);
 						
 		if (bg_img != undefined) {
 			
