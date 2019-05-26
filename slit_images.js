@@ -128,33 +128,17 @@ var img_dir = 'gfx/';
 	bg_img.onload = cb;
 	bg_img.src = img_dir + image_filename;
 }*/
+
+var init_time = (new Date()).getTime();
+
+var ext = {'num_lines': 20, 'cos_width': 10};
+
 function drawCanvas() {
 
 	resize();
 
 	var num_nodes = 120;
-	var num_lines = 500;
 //	var angle = (Math.PI*2)/num;
-
-	for (let i=0; i<num_lines; i++) {
-		values[i] = [];
-		let lsep = w/num_lines;
-		//let nsep = h/num_nodes;
-		
-		for (let j=0; j<num_nodes; j++) {
-			let rnd = rand(5)-2;
-			let prev = 0;
-			if (i!=0) prev = values[i-1][j];
-			
-			values[i][j] = prev + lsep + rnd;
-			
-			//if (j==0) ctx.moveTo(values[i][j], j * nsep);
-			// else ctx.lineTo(values[i][j], j * nsep);
-		}
-		
-		//ctx.stroke();
-		//ctx.closePath();
-	}
 
 	var sync = 100;
 	var csync = 0;
@@ -162,13 +146,13 @@ function drawCanvas() {
 
 	var bgcolor = 'rgba(0,0,0,1.0)';
 	
-	var init_time = (new Date()).getTime();
 	//console.log(img_ref);
 	var bg_img = img_ref[2];
 	
 	function drawThis(milis) {
 		
-		let split = '100100001110'; //params['split_data']['value']);
+	let num_lines = ext['num_lines'];
+	let cos_width = ext['cos_width'];
 						
 		if (bg_img != undefined) {
 			
@@ -176,25 +160,28 @@ function drawCanvas() {
 			n2 = d2.getTime(); 
 			timer = (n2-init_time);
 
-			let len = Math.floor(w / split.length);
+			let len = Math.floor(w / num_lines);
 			let iw = bg_img.width;
 			let ih = bg_img.height;
-			let ilen = Math.floor(iw / split.length);
-			let iwww = iw/ilen;
+			let ilen = Math.floor(iw / num_lines);
+			//let iwww = iw/ilen;
 			//console.log(ilen);
 			
-			for (let i=0; i < split.length; i++) {
+			for (let i=0; i < num_lines; i++) {
 				
-				let wild = (1-parseInt(split[i],10)) * (rand(5) + Math.cos(timer) + Math.sin(timer));
+				for (let j=0.0; j<Math.PI*2; j+=Math.PI*0.1) {
+					
+					let top_elev = 0.5+Math.sin((i/num_lines+Math.cos(i*0.5)*cos_width)*0.01+j+timer*0.0001)*0.5; //(Math.sin( Math.abs(num_lines-i) + timer*0.001) + 1.0) * 0.5;
 				
-				let top_elev = (Math.sin( i*Math.PI*0.02 + wild + (timer/(Math.PI*200)) ) + 1.0) * 0.5;
+					let imid = top_elev * ih;
+					let mid = top_elev * h;
+					
+					ctx.drawImage(bg_img, i*ilen, imid, ilen, ilen*ih/iw, i*len, mid, len, len*h/w);
+				}
 				
-				let imid = top_elev * ih;
-				let mid = top_elev * h;
+				//ctx.drawImage(bg_img, i*ilen, imid, i*ilen+ilen, ih-imid, i*len, 0,   i*len+len, h-mid);
 				
-				ctx.drawImage(bg_img, i*ilen, imid, i*ilen+ilen, ih-imid, i*len, 0,   i*len+len, h-mid);
-				
-				ctx.drawImage(bg_img, i*ilen, 0,    i*ilen+ilen, imid,    i*len, h-mid, i*len+len, h);
+				//ctx.drawImage(bg_img, i*ilen, 0,    i*ilen+ilen, imid,    i*len, h-mid, i*len+len, h);
 				
 				//ctx.drawImage(bg_img, i*ilen, imid, i*ilen+ilen, ih-imid, i*len, mid, i*len+len, h-mid);
 			}
@@ -208,6 +195,8 @@ function drawCanvas() {
 	function animate() {
 		requestAnimationFrame( animate );
 		let milis = (new Date()).getTime() - init_time;
+		ctx.clearRect(0,0,w,h);
+		ctx.drawImage(img_ref[1],0,0,w,h);
 		drawThis(milis);
 	}
 }
@@ -224,4 +213,19 @@ function resize() {
 	ctx = c.getContext("2d");
 	ctx.width = w;
 	ctx.height = h;
+}
+
+
+document.addEventListener("keydown", keyDownTextField, false);
+
+function keyDownTextField(e) {
+	var keyCode = e.keyCode;
+	console.log(keyCode);
+
+	switch(keyCode) {
+		case 32: // space
+			ext = {'num_lines': 30, 'cos_width': 20};
+		break;
+	}
+
 }
