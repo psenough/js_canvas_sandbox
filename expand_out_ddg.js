@@ -124,12 +124,13 @@ var init_time = (new Date()).getTime();
 
 var ext = {'num_lines': 20, 'cos_width': 10};
 
+let scheduled_pings;
+
 function drawCanvas() {
 
 	resize();
 
 	var num_nodes = 120;
-//	var angle = (Math.PI*2)/num;
 
 	var sync = 100;
 	var csync = 0;
@@ -137,66 +138,39 @@ function drawCanvas() {
 
 	var bgcolor = 'rgba(0,0,0,1.0)';
 	
-	//console.log(img_ref);
-	var bg_img = img_ref[2];
-	
 	function drawThis(milis) {
 		
-	let num_lines = ext['num_lines'];
-	let cos_width = ext['cos_width'];
-						
-		if (bg_img != undefined) {
-			
-			d2 = new Date();
-			n2 = d2.getTime(); 
-			timer = (n2-init_time);
+		let num_lines = ext['num_lines'];
+		let cos_width = ext['cos_width'];
+							
+		d2 = new Date();
+		n2 = d2.getTime(); 
+		timer = (n2-init_time);
+		//console.log(timer);
 
-			let len = Math.floor(w / num_lines);
-			let iw = bg_img.width;
-			let ih = bg_img.height;
-			let ilen = Math.floor(iw / num_lines);
-			//let iwww = iw/ilen;
-			//console.log(ilen);
-			
-			/*ctx.save();
-			ctx.fillStyle = "red";
-			//ctx.rect(40, 20, 200, 200);
-			ctx.beginPath();
-			ctx.arc(200, 175, 200, 0, 2 * Math.PI);
-			//ctx.fill();
-			//ctx.stroke();
-			ctx.clip();
-			
-			ctx.drawImage(img_ref[2],0,0,w,h);
-			
-			ctx.beginPath();
-			ctx.arc(250, 175, 50, 0, 2 * Math.PI);
-			ctx.clip();
-			ctx.drawImage(img_ref[3],0,0,w,h);
-			ctx.restore();*/
-			
+		for (let j=0; j<scheduled_pings.length; j++) {
+			let timed = timer;//-scheduled_pings[j]['inittime'];
+			let initimg = scheduled_pings[j]['initimg'];
+			let initx = scheduled_pings[j]['initx'];
+			let inity = scheduled_pings[j]['inity'];
+			let niter = scheduled_pings[j]['niter'];
+			let speed = scheduled_pings[j]['speed'];
+			let width = scheduled_pings[j]['width'];
+			//console.log(niter + ' ' + initx);
 			ctx.save();
-			var im = img_ref.length;
-			for (var i=0; i<im; i++) {
+			var im = initimg+niter; //img_ref.length;
+			for (var i=initimg; i<im; i++) {
 				ctx.beginPath();
-				var radius = -200*im + 200*(im-i) + timer*0.5;
+				var radius = -width*im + width*(im-i) + timed*0.5;
+				//console.log(initx);
 				if (radius > 0) {
-					ctx.arc(w*0.5, h*0.5, radius, 0, 2 * Math.PI);
+					ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
 					ctx.clip();
 					ctx.drawImage(img_ref[i],0,0,w,h);
 				}
 			}
 			ctx.restore();
-			
-			
-				//ctx.drawImage(bg_img, i*ilen, imid, i*ilen+ilen, ih-imid, i*len, 0,   i*len+len, h-mid);
-				
-				//ctx.drawImage(bg_img, i*ilen, 0,    i*ilen+ilen, imid,    i*len, h-mid, i*len+len, h);
-				
-				//ctx.drawImage(bg_img, i*ilen, imid, i*ilen+ilen, ih-imid, i*len, mid, i*len+len, h-mid);
-		
 		}
-		
 		
 	}
 	
@@ -223,6 +197,11 @@ function resize() {
 	ctx = c.getContext("2d");
 	ctx.width = w;
 	ctx.height = h;
+	
+	scheduled_pings = [
+		{'inittime': 0, 'initimg': 0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 200 }
+		,{'inittime': 3000, 'initimg': 10, 'initx': w*0.8, 'inity': h*0.8, 'niter': 2, 'speed': 0.8, 'width': 100 }
+	];
 }
 
 
