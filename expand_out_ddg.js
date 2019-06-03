@@ -51,6 +51,94 @@ c.style.background = "transparent";
         };
 }());
 
+
+
+var rms = 0;
+
+var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
+//var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
+//var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
+var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+//var is_opera = navigator.userAgent.indexOf("Presto") > -1;
+if ((is_chrome)&&(is_safari)) {is_safari=false;}
+
+var backgroundAudio;
+var analyser;
+var bufferLength;
+var dataArray;
+				
+function init() {
+	    
+	var context;
+	
+	try {
+		// Fix up for prefixing
+		window.AudioContext = window.AudioContext||window.webkitAudioContext;
+		if (backgroundAudio != undefined) backgroundAudio.stop();
+		context = new AudioContext();
+
+		var request = new XMLHttpRequest();
+		//if (is_safari) request.open('GET', 'esem_gre_ii.m4a', true);
+		//	else request.open('GET', 'esem_gre_ii.ogg', true);		
+		if (is_safari) request.open('GET', 'audio/himalayha_-_tao_perto_tao_longe.m4a', true);
+			else request.open('GET', 'audio/himalayha_-_tao_perto_tao_longe.ogg', true);
+		request.responseType = 'arraybuffer';
+		console.log('requesting');
+
+		// Decode asynchronously
+		request.onload = function() {
+			context.decodeAudioData(request.response, function(buffer) {
+	  
+				backgroundAudio = context.createBufferSource(); 	// creates a sound source
+				backgroundAudio.buffer = buffer;                    // tell the source which sound to play
+				backgroundAudio.connect(context.destination);       // connect the source to the context's destination (the speakers)
+				backgroundAudio.loop = true;
+				backgroundAudio.start(0);
+				
+				analyser = context.createAnalyser();
+				analyser.fftSize = 256;
+				bufferLength = analyser.fftSize;
+				dataArray = new Uint8Array(bufferLength);
+				analyser.getByteTimeDomainData(dataArray);
+				backgroundAudio.connect(analyser);
+				/*analyser.connect(context.destination);*/
+				
+				// start canvas
+				drawCanvas();
+	  
+				console.log('decoded');
+
+	  
+			}, function(evt) {
+				console.log('failed to load buffer');
+				console.log(evt);
+			});
+		}
+		request.send();
+
+	} catch(e) {
+		console.log('Web Audio API is not supported in this browser');
+		console.log(e);
+		drawCanvas();
+	}
+
+}
+var buffer;
+
+var process = function(e) {
+	buffer = e.inputBuffer.getChannelData(0);
+	var len = buffer.length; 
+	var total = 0;
+	var i = 0;
+	
+	freq1 = Math.abs(buffer[parseInt(len*0.015,10)]*2.0);
+	freq2 = Math.abs(buffer[parseInt(len*0.1,10)]*2.0);
+
+	while ( i < len ) total += Math.abs( buffer[i++] );
+	
+	rms = (rms + Math.sqrt( total / len )) * 0.5;
+}
+
 var img_ref = [];
 
 function ImageLoader(Ref, ImgDir, Images, Callback){
@@ -101,7 +189,10 @@ function ImageLoader(Ref, ImgDir, Images, Callback){
 
 b.onload = function() {
 	
-	ImageLoader(img_ref, './gfx/autumn1_ddg/', autumn1_ddg, 
+}
+
+function LoadAndLaunch() {
+	ImageLoader(img_ref, './gfx/spring3_ddg/', spring3_ddg, 
 		function(result){
 			if(result.error.length != 0){
 				// outputs: ["example.png", "example.jpg"]
@@ -110,9 +201,8 @@ b.onload = function() {
 
 			// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
 			console.log("The following images were succesfully loaded: ", result.success);
-			drawCanvas();
+			init();
 	});
-	
 }
 
 var w;
@@ -126,6 +216,8 @@ var ext = {'num_lines': 20, 'cos_width': 10};
 
 let scheduled_pings;
 
+let avg = 0.0;
+
 function drawCanvas() {
 
 	resize();
@@ -137,6 +229,35 @@ function drawCanvas() {
 	var bsync = 0;
 
 	var bgcolor = 'rgba(0,0,0,1.0)';
+	
+	function drawSpectrum() {
+	
+		//let cnt = 0.0;
+		
+		analyser.getByteTimeDomainData(dataArray);
+		
+		let wb = w / bufferLength; // 1000 / 20 = 50
+		
+		for(let i = 0; i < bufferLength; i++) {
+			let v = dataArray[i] / bufferLength;
+			let d = (1.0+Math.sin(v*20.0))*v*10.0;			
+			//if (i == 1) console.log(v);
+			color = "rgba(255,255,255,"+v*0.25+")";
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			/*ctx.moveTo(i*4+0,h-v*h);
+			ctx.lineTo(i*4+2,h-v*h);
+			ctx.lineTo(i*4+2,h);
+			ctx.lineTo(i*4+0,h);*/
+			ctx.moveTo(i*wb-d,0);
+			ctx.lineTo(i*wb+wb+d,0);
+			ctx.lineTo(i*wb+wb+d,h);
+			ctx.lineTo(i*wb-d,h);
+			ctx.fill();
+			//cnt += v;
+		}
+		//avg = (avg + avg + cnt/fftsize) / 3;
+	}
 	
 	function drawThis(milis) {
 		
@@ -172,6 +293,8 @@ function drawCanvas() {
 			ctx.restore();
 		}
 		
+		drawSpectrum();
+		
 	}
 	
 	requestAnimationFrame( animate );
@@ -180,6 +303,8 @@ function drawCanvas() {
 		requestAnimationFrame( animate );
 		let milis = (new Date()).getTime() - init_time;
 		ctx.clearRect(0,0,w,h);
+		ctx.globalAlpha = 1.0;
+		//console.log(avg);
 		//ctx.drawImage(img_ref[1],0,0,w,h);
 		drawThis(milis);
 	}
@@ -203,6 +328,10 @@ function resize() {
 		,{'inittime': 3000, 'initimg': 10, 'initx': w*0.8, 'inity': h*0.8, 'niter': 2, 'speed': 0.8, 'width': 100 }
 	];
 }
+
+window.addEventListener("click", function(event) {
+	LoadAndLaunch();
+});
 
 
 document.addEventListener("keydown", keyDownTextField, false);
