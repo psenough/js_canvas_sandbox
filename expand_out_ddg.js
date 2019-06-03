@@ -17,10 +17,10 @@ var Ms = b.style;
 Ms.margin='0px';
 var blackcolor = Ms.background = "#000";
 Ms.overflow = 'hidden';
-b.innerHTML = '';
-var c = D.createElement('canvas');
-b.appendChild(c);
-c.style.background = "transparent";
+//var c = D.createElement('canvas');
+//b.appendChild(c);
+c = document.getElementById('c');
+
 
 //
 // request animation frame, from random place on the internet
@@ -67,7 +67,7 @@ var analyser;
 var bufferLength;
 var dataArray;
 				
-function init() {
+function initAudio( cb ) {
 	    
 	var context;
 	
@@ -92,8 +92,8 @@ function init() {
 				backgroundAudio = context.createBufferSource(); 	// creates a sound source
 				backgroundAudio.buffer = buffer;                    // tell the source which sound to play
 				backgroundAudio.connect(context.destination);       // connect the source to the context's destination (the speakers)
-				backgroundAudio.loop = true;
-				backgroundAudio.start(0);
+				backgroundAudio.loop = false;
+				//backgroundAudio.start(0);
 				
 				analyser = context.createAnalyser();
 				analyser.fftSize = 256;
@@ -104,10 +104,11 @@ function init() {
 				/*analyser.connect(context.destination);*/
 				
 				// start canvas
-				drawCanvas();
+				//drawCanvas();
 	  
 				console.log('decoded');
 
+				cb();
 	  
 			}, function(evt) {
 				console.log('failed to load buffer');
@@ -119,7 +120,7 @@ function init() {
 	} catch(e) {
 		console.log('Web Audio API is not supported in this browser');
 		console.log(e);
-		drawCanvas();
+		//drawCanvas();
 	}
 
 }
@@ -187,11 +188,16 @@ function ImageLoader(Ref, ImgDir, Images, Callback){
     }
 }
 
+var vignette;
+
 b.onload = function() {
 	
-}
-
-function LoadAndLaunch() {
+	vignette = new Image();
+    vignette.src = './gfx/reference_vignette.png';
+	vignette.addEventListener("load", function(){
+		console.log('my vignette is dark and long!');
+	}, false);
+	
 	ImageLoader(img_ref, './gfx/spring3_ddg/', spring3_ddg, 
 		function(result){
 			if(result.error.length != 0){
@@ -201,8 +207,16 @@ function LoadAndLaunch() {
 
 			// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
 			console.log("The following images were succesfully loaded: ", result.success);
-			init();
+			//init();
+			initAudio( function(){
+				let dom = document.getElementById('btn');
+				if (dom) {
+					dom.value = 'Start Demo!';
+					dom.disabled = false;
+				}
+			} );
 	});
+	
 }
 
 var w;
@@ -220,8 +234,6 @@ let avg = 0.0;
 
 function drawCanvas() {
 
-	resize();
-
 	var num_nodes = 120;
 
 	var sync = 100;
@@ -230,59 +242,41 @@ function drawCanvas() {
 
 	var bgcolor = 'rgba(0,0,0,1.0)';
 	
-	function drawSpectrum() {
-	
-		//let cnt = 0.0;
-		
+	function drawSpectrum() {	
 		analyser.getByteTimeDomainData(dataArray);
-		
-		let wb = w / bufferLength; // 1000 / 20 = 50
-		
+		let wb = w / bufferLength;	
 		for(let i = 0; i < bufferLength; i++) {
 			let v = dataArray[i] / bufferLength;
 			let d = (1.0+Math.sin(v*20.0))*v*10.0;			
-			//if (i == 1) console.log(v);
 			color = "rgba(255,255,255,"+v*0.25+")";
 			ctx.fillStyle = color;
 			ctx.beginPath();
-			/*ctx.moveTo(i*4+0,h-v*h);
-			ctx.lineTo(i*4+2,h-v*h);
-			ctx.lineTo(i*4+2,h);
-			ctx.lineTo(i*4+0,h);*/
 			ctx.moveTo(i*wb-d,0);
 			ctx.lineTo(i*wb+wb+d,0);
 			ctx.lineTo(i*wb+wb+d,h);
 			ctx.lineTo(i*wb-d,h);
 			ctx.fill();
-			//cnt += v;
 		}
-		//avg = (avg + avg + cnt/fftsize) / 3;
 	}
 	
-	function drawThis(milis) {
-		
-		let num_lines = ext['num_lines'];
-		let cos_width = ext['cos_width'];
-							
-		d2 = new Date();
-		n2 = d2.getTime(); 
-		timer = (n2-init_time);
-		//console.log(timer);
+	function drawPings() {
+		let timer = ((new Date()).getTime()-init_time);
+		let dom = document.getElementById('timer');
+		if (dom) dom.innerText = timer;
 
 		for (let j=0; j<scheduled_pings.length; j++) {
-			let timed = timer;//-scheduled_pings[j]['inittime'];
+			let timed = timer-scheduled_pings[j]['inittime'];
 			let initimg = scheduled_pings[j]['initimg'];
 			let initx = scheduled_pings[j]['initx'];
 			let inity = scheduled_pings[j]['inity'];
 			let niter = scheduled_pings[j]['niter'];
 			let speed = scheduled_pings[j]['speed'];
 			let width = scheduled_pings[j]['width'];
-			//console.log(niter + ' ' + initx);
 			ctx.save();
 			var im = initimg+niter; //img_ref.length;
 			for (var i=initimg; i<im; i++) {
 				ctx.beginPath();
-				var radius = -width*im + width*(im-i) + timed*0.5;
+				var radius = -width*im + width*(im-i) + timed*0.5 + width*initimg;
 				//console.log(initx);
 				if (radius > 0) {
 					ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
@@ -293,20 +287,19 @@ function drawCanvas() {
 			ctx.restore();
 		}
 		
-		drawSpectrum();
-		
 	}
 	
 	requestAnimationFrame( animate );
 
 	function animate() {
 		requestAnimationFrame( animate );
-		let milis = (new Date()).getTime() - init_time;
 		ctx.clearRect(0,0,w,h);
 		ctx.globalAlpha = 1.0;
 		//console.log(avg);
 		//ctx.drawImage(img_ref[1],0,0,w,h);
-		drawThis(milis);
+		drawPings();
+		drawSpectrum();
+		ctx.drawImage(vignette,0,0,w,h);
 	}
 }
 
@@ -322,17 +315,48 @@ function resize() {
 	ctx = c.getContext("2d");
 	ctx.width = w;
 	ctx.height = h;
-	
-	scheduled_pings = [
-		{'inittime': 0, 'initimg': 0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 200 }
-		,{'inittime': 3000, 'initimg': 10, 'initx': w*0.8, 'inity': h*0.8, 'niter': 2, 'speed': 0.8, 'width': 100 }
-	];
 }
 
-window.addEventListener("click", function(event) {
-	LoadAndLaunch();
-});
+function start() {
+	let dom = document.getElementById('btn');
+	if (dom) dom.parentNode.removeChild(dom);
 
+	resize();
+	scheduled_pings = [
+		{'inittime':      0, 'initimg':  0, 'initx': 0, 'inity': h*0.5, 'niter': 7, 'speed': 0.3, 'width': 300 }
+		,{'inittime':  4000, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 7, 'speed': 0.2, 'width': 200 }
+		,{'inittime':  8000, 'initimg': 12, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
+		,{'inittime': 12000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
+		,{'inittime': 16000, 'initimg':  9, 'initx': 0, 'inity': h*0.5, 'niter': 7, 'speed': 0.3, 'width': 300 }
+		,{'inittime': 20000, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 7, 'speed': 0.2, 'width': 200 }
+		,{'inittime': 24000, 'initimg': 13, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime': 32000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 36000, 'initimg': 17, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 40000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 44000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 48000, 'initimg': 20, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 48400, 'initimg': 21, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 48800, 'initimg': 22, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 49300, 'initimg': 23, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 52000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 52300, 'initimg':  2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 52600, 'initimg':  3, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 56000, 'initimg':  7, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 56500, 'initimg':  8, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 57300, 'initimg':  9, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 58800, 'initimg': 10, 'initx': w*0.25, 'inity': h*0.5, 'niter': 10, 'speed': 0.2, 'width': 25 }
+		,{'inittime': 59300, 'initimg': 10, 'initx': w*0.75, 'inity': h*0.5, 'niter': 10, 'speed': 0.2, 'width': 25 }
+		,{'inittime': 60000, 'initimg':  1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 64000, 'initimg': 23, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 68000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 75000, 'initimg': 1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 25 }
+
+	];
+	backgroundAudio.start(0);
+	init_time = (new Date()).getTime();
+	drawCanvas();
+}
 
 document.addEventListener("keydown", keyDownTextField, false);
 
@@ -342,8 +366,8 @@ function keyDownTextField(e) {
 
 	switch(keyCode) {
 		case 32: // space
-			//ext = {'num_lines': 30, 'cos_width': 20};
-			init_time = (new Date()).getTime();
+			//init_time = (new Date()).getTime();
+			backgroundAudio.stop();
 		break;
 	}
 
