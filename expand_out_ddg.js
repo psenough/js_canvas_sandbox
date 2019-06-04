@@ -323,18 +323,18 @@ function start() {
 
 	resize();
 	scheduled_pings = [
-		{'inittime':      0, 'initimg':  0, 'initx': 0, 'inity': h*0.5, 'niter': 7, 'speed': 0.3, 'width': 300 }
-		,{'inittime':  4000, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 7, 'speed': 0.2, 'width': 200 }
+		{'inittime':      0, 'initimg':  0, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
+		,{'inittime':  4400, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
 		,{'inittime':  8000, 'initimg': 12, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
 		,{'inittime': 12000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
-		,{'inittime': 16000, 'initimg':  9, 'initx': 0, 'inity': h*0.5, 'niter': 7, 'speed': 0.3, 'width': 300 }
-		,{'inittime': 20000, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 7, 'speed': 0.2, 'width': 200 }
-		,{'inittime': 24000, 'initimg': 13, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime': 16000, 'initimg':  9, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
+		,{'inittime': 20400, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
+		,{'inittime': 24000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 32000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 36000, 'initimg': 17, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 40000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 44000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 40000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 44000, 'initimg': 11, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48000, 'initimg': 20, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48400, 'initimg': 21, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48800, 'initimg': 22, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -350,7 +350,19 @@ function start() {
 		,{'inittime': 60000, 'initimg':  1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 64000, 'initimg': 23, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 68000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 75000, 'initimg': 1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 25 }
+		,{'inittime': 70500, 'initimg':  2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 72000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 72400, 'initimg':  4, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 72800, 'initimg':  5, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 73150, 'initimg':  6, 'initx': w*0.8, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 74600, 'initimg':  8, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 76100, 'initimg':  9, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 76100, 'initimg': 10, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 76200, 'initimg': 11, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 76500, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 84000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 86500, 'initimg': 15, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
 	];
 	backgroundAudio.start(0);
