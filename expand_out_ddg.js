@@ -250,11 +250,7 @@ function drawCanvas() {
 		}
 	}
 	
-	function drawPings() {
-		let timer = ((new Date()).getTime()-init_time);
-		let dom = document.getElementById('timer');
-		if (dom) dom.innerText = timer;
-
+	function drawPings(timer) {
 		let img_ref;
 		if (timer < 96000) img_ref = img_ref_spring;
 			else img_ref = img_ref_winter;
@@ -287,12 +283,15 @@ function drawCanvas() {
 	requestAnimationFrame( animate );
 
 	function animate() {
-		requestAnimationFrame( animate );
+		let timer = ((new Date()).getTime()-init_time);
+		if (timer < 200000) requestAnimationFrame( animate );
+		let dom = document.getElementById('timer');
+		if (dom) dom.innerText = timer;
 		ctx.clearRect(0,0,w,h);
 		ctx.globalAlpha = 1.0;
 		//console.log(avg);
 		//ctx.drawImage(img_ref[1],0,0,w,h);
-		drawPings();
+		drawPings(timer);
 		drawSpectrum();
 		ctx.drawImage(vignette,0,0,w,h);
 	}
@@ -482,7 +481,7 @@ function start() {
 		,{'inittime':185200, 'initimg': 17, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
 		,{'inittime':188000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime':188300, 'initimg': 19, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':188300, 'initimg': 22, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':188600, 'initimg': 20, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
 		,{'inittime':192000, 'initimg': 21, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 80 }
