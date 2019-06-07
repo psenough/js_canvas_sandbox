@@ -124,23 +124,9 @@ function initAudio( cb ) {
 	}
 
 }
-var buffer;
 
-var process = function(e) {
-	buffer = e.inputBuffer.getChannelData(0);
-	var len = buffer.length; 
-	var total = 0;
-	var i = 0;
-	
-	freq1 = Math.abs(buffer[parseInt(len*0.015,10)]*2.0);
-	freq2 = Math.abs(buffer[parseInt(len*0.1,10)]*2.0);
-
-	while ( i < len ) total += Math.abs( buffer[i++] );
-	
-	rms = (rms + Math.sqrt( total / len )) * 0.5;
-}
-
-var img_ref = [];
+var img_ref_spring = [];
+var img_ref_winter = [];
 
 function ImageLoader(Ref, ImgDir, Images, Callback){
     // Keep the count of the verified images
@@ -198,23 +184,30 @@ b.onload = function() {
 		console.log('my vignette is dark and long!');
 	}, false);
 	
-	ImageLoader(img_ref, './gfx/spring3_ddg/', spring3_ddg, 
+	ImageLoader(img_ref_spring, './gfx/spring3_ddg/', spring3_ddg, 
 		function(result){
 			if(result.error.length != 0){
-				// outputs: ["example.png", "example.jpg"]
 				console.log("The following images couldn't be properly loaded: ", result.error);
 			}
 
-			// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
-			console.log("The following images were succesfully loaded: ", result.success);
-			//init();
-			initAudio( function(){
-				let dom = document.getElementById('btn');
-				if (dom) {
-					dom.value = 'Start Demo!';
-					dom.disabled = false;
-				}
-			} );
+			ImageLoader(img_ref_winter, './gfx/winter1_ddg/', winter1_ddg, 
+				function(result){
+					if(result.error.length != 0){
+						// outputs: ["example.png", "example.jpg"]
+						console.log("The following images couldn't be properly loaded: ", result.error);
+					}
+
+					// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
+					console.log("The following images were succesfully loaded: ", result.success);
+					//init();
+					initAudio( function(){
+						let dom = document.getElementById('btn');
+						if (dom) {
+							dom.value = 'Start Demo!';
+							dom.disabled = false;
+						}
+					} );
+			});
 	});
 	
 }
@@ -225,8 +218,6 @@ var ctx;
 var values = [];
 
 var init_time = (new Date()).getTime();
-
-var ext = {'num_lines': 20, 'cos_width': 10};
 
 let scheduled_pings;
 
@@ -263,6 +254,10 @@ function drawCanvas() {
 		let timer = ((new Date()).getTime()-init_time);
 		let dom = document.getElementById('timer');
 		if (dom) dom.innerText = timer;
+
+		let img_ref;
+		if (timer < 96000) img_ref = img_ref_spring;
+			else img_ref = img_ref_winter;
 
 		for (let j=0; j<scheduled_pings.length; j++) {
 			let timed = timer-scheduled_pings[j]['inittime'];
@@ -324,11 +319,11 @@ function start() {
 	resize();
 	scheduled_pings = [
 		{'inittime':      0, 'initimg':  0, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
-		,{'inittime':  4400, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
+		,{'inittime':  4500, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
 		,{'inittime':  8000, 'initimg': 12, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
 		,{'inittime': 12000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
 		,{'inittime': 16000, 'initimg':  9, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
-		,{'inittime': 20400, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
+		,{'inittime': 20500, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
 		,{'inittime': 24000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 32000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -351,7 +346,7 @@ function start() {
 		,{'inittime': 64000, 'initimg': 23, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 68000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 70500, 'initimg':  2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 72000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 72000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 72400, 'initimg':  4, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 72800, 'initimg':  5, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 73150, 'initimg':  6, 'initx': w*0.8, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
@@ -363,6 +358,32 @@ function start() {
 		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 84000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 86500, 'initimg': 15, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 88000, 'initimg':  1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 88400, 'initimg':  2, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 88800, 'initimg':  3, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 89200, 'initimg':  4, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 90600, 'initimg':  7, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 92000, 'initimg':  8, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 92200, 'initimg':  9, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 92500, 'initimg': 10, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime': 96000, 'initimg':  1, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 97000, 'initimg':  2, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 97550, 'initimg':  3, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 97850, 'initimg':  4, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':100000, 'initimg':  5, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':101100, 'initimg':  8, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':101500, 'initimg':  9, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':102000, 'initimg': 10, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':104000, 'initimg': 11, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':105100, 'initimg': 12, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':105500, 'initimg': 13, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':105600, 'initimg': 14, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':108000, 'initimg': 15, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':109000, 'initimg': 19, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':109500, 'initimg': 20, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':109600, 'initimg': 21, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':112000, 'initimg': 22, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
 	];
 	backgroundAudio.start(0);
