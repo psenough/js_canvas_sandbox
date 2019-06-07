@@ -313,23 +313,23 @@ function resize() {
 }
 
 function start() {
-	let dom = document.getElementById('btn');
+	let dom = document.getElementById('starter_menu');
 	if (dom) dom.parentNode.removeChild(dom);
-
+	
 	resize();
 	scheduled_pings = [
-		{'inittime':      0, 'initimg':  0, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
-		,{'inittime':  4500, 'initimg':  5, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
+		 {'inittime':     0, 'initimg':  0, 'initx': -w*0.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.7, 'width': 350 }
+		,{'inittime':  4600, 'initimg':  4, 'initx': w*1.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.5, 'width': 300 }
 		,{'inittime':  8000, 'initimg': 12, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
 		,{'inittime': 12000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.8, 'width': 50 }
-		,{'inittime': 16000, 'initimg':  9, 'initx': 0, 'inity': h*0.5, 'niter': 6, 'speed': 0.3, 'width': 300 }
-		,{'inittime': 20500, 'initimg': 13, 'initx': w, 'inity': h*0.5, 'niter': 6, 'speed': 0.2, 'width': 250 }
+		,{'inittime': 16000, 'initimg':  9, 'initx': -w*0.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.7, 'width': 350 }
+		,{'inittime': 20600, 'initimg': 13, 'initx': w*1.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.5, 'width': 300 }
 		,{'inittime': 24000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
-		,{'inittime': 32000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 36000, 'initimg': 17, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 32000, 'initimg': 16, 'initx': w*(0.4+Math.random()*0.2), 'inity': h*(0.4+Math.random()*0.2), 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 36000, 'initimg': 17, 'initx': w*(0.4+Math.random()*0.2), 'inity': h*(0.4+Math.random()*0.2), 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 40000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 44000, 'initimg': 11, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 44000, 'initimg': 11, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48000, 'initimg': 20, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48400, 'initimg': 21, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48800, 'initimg': 22, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -343,10 +343,10 @@ function start() {
 		,{'inittime': 58800, 'initimg': 10, 'initx': w*0.25, 'inity': h*0.5, 'niter': 10, 'speed': 0.2, 'width': 25 }
 		,{'inittime': 59300, 'initimg': 10, 'initx': w*0.75, 'inity': h*0.5, 'niter': 10, 'speed': 0.2, 'width': 25 }
 		,{'inittime': 60000, 'initimg':  1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 64000, 'initimg': 23, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 68000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 70500, 'initimg':  2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 72000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 64000, 'initimg': 23, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 68000, 'initimg': 16, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 70500, 'initimg':  2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 72000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 72400, 'initimg':  4, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 72800, 'initimg':  5, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 73150, 'initimg':  6, 'initx': w*0.8, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
@@ -355,22 +355,23 @@ function start() {
 		,{'inittime': 76100, 'initimg': 10, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 76200, 'initimg': 11, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 76500, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.55, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 84000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 86500, 'initimg': 15, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 88000, 'initimg':  1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 88400, 'initimg':  2, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 88800, 'initimg':  3, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 89200, 'initimg':  4, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 90600, 'initimg':  7, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 90600, 'initimg': 12, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 92000, 'initimg':  8, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 92200, 'initimg':  9, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 92500, 'initimg': 10, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
-		,{'inittime': 96000, 'initimg':  1, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		//,{'inittime': 96000, 'initimg':  1, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 97000, 'initimg':  2, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 97550, 'initimg':  3, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 97850, 'initimg':  4, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 97500, 'initimg':  3, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 98000, 'initimg':  4, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':100000, 'initimg':  5, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
 		,{'inittime':101100, 'initimg':  8, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':101500, 'initimg':  9, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -378,12 +379,113 @@ function start() {
 		,{'inittime':104000, 'initimg': 11, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
 		,{'inittime':105100, 'initimg': 12, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':105500, 'initimg': 13, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':105600, 'initimg': 14, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':106000, 'initimg': 14, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':108000, 'initimg': 15, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
  		,{'inittime':109000, 'initimg': 19, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':109500, 'initimg': 20, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
- 		,{'inittime':109600, 'initimg': 21, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
- 		,{'inittime':112000, 'initimg': 22, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':110000, 'initimg': 21, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':112000, 'initimg': 22, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':113000, 'initimg': 27, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':113500, 'initimg': 28, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':114000, 'initimg': 31, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+ 		,{'inittime':115000, 'initimg': 29, 'initx': w*0.25, 'inity': h*0.25, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':115500, 'initimg': 30, 'initx': w*0.75, 'inity': h*0.75, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':116000, 'initimg':  0, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':117000, 'initimg':  5, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':117500, 'initimg':  6, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':118000, 'initimg':  7, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':119000, 'initimg':  8, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':119500, 'initimg':  9, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':120000, 'initimg': 10, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':121000, 'initimg': 15, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':121500, 'initimg': 16, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':122000, 'initimg': 17, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':123000, 'initimg': 18, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':123500, 'initimg': 19, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':124000, 'initimg': 20, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':125000, 'initimg': 25, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':125500, 'initimg': 26, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':126000, 'initimg': 27, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':127000, 'initimg': 28, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':127500, 'initimg': 29, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':128000, 'initimg': 30, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.25, 'width': 50 }
+
+ 		,{'inittime':131000, 'initimg': 1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':131500, 'initimg': 2, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':132000, 'initimg': 3, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.25, 'width': 50 }
+  		
+		,{'inittime':135000, 'initimg': 4, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':135500, 'initimg': 5, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':136000, 'initimg': 6, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+
+		,{'inittime':139000, 'initimg': 7, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':139500, 'initimg': 8, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':140000, 'initimg': 9, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+
+		,{'inittime':143000, 'initimg': 11, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':143500, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':144000, 'initimg': 13, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime':145000, 'initimg': 18, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':145500, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':146000, 'initimg': 20, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':148000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':149000, 'initimg': 21, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':149500, 'initimg': 22, 'initx': w*0.75, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime':150000, 'initimg': 25, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':152000, 'initimg': 26, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':153000, 'initimg': 30, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':153500, 'initimg': 31, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':154000, 'initimg': 32, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		
+		,{'inittime':156000, 'initimg': 33, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':157000, 'initimg': 0, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':157500, 'initimg': 1, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':158000, 'initimg': 2, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':159000, 'initimg': 3, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':159500, 'initimg': 4, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':160000, 'initimg': 5, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+				
+		,{'inittime':161000, 'initimg': 9, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':161500, 'initimg': 10, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':162000, 'initimg': 11, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':163000, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':163500, 'initimg': 13, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':164000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		,{'inittime':165000, 'initimg': 20, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':165500, 'initimg': 21, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':166000, 'initimg': 22, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':167000, 'initimg': 23, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':167500, 'initimg': 24, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':168000, 'initimg': 25, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':169000, 'initimg': 29, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':169500, 'initimg': 30, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':170000, 'initimg': 31, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':171000, 'initimg': 32, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':171500, 'initimg': 33, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':172000, 'initimg': 1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
+		
+		,{'inittime':173000, 'initimg': 2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':173500, 'initimg': 4, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':174000, 'initimg': 6, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':176000, 'initimg': 9, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 80 }
+		,{'inittime':180000, 'initimg': 12, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 80 }
+		
+		,{'inittime':184000, 'initimg': 13, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 80 }
+		,{'inittime':184400, 'initimg': 14, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':184800, 'initimg': 16, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':185200, 'initimg': 17, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':188000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime':188300, 'initimg': 19, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':188600, 'initimg': 20, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+
+		,{'inittime':192000, 'initimg': 21, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 80 }
 
 	];
 	backgroundAudio.start(0);
