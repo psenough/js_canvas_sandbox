@@ -283,7 +283,9 @@ function drawCanvas() {
 	requestAnimationFrame( animate );
 
 	function animate() {
-		let timer = ((new Date()).getTime()-init_time);
+		let timer;
+		if (skip == true) timer = skip_timer;
+		 else timer = ((new Date()).getTime()-init_time);
 		if (timer < 200000) requestAnimationFrame( animate );
 		let dom = document.getElementById('timer');
 		if (dom) dom.innerText = timer;
@@ -487,7 +489,7 @@ function start() {
 		,{'inittime':192000, 'initimg': 21, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 80 }
 
 	];
-	backgroundAudio.start(0);
+	backgroundAudio.start(0, 0);
 	init_time = (new Date()).getTime();
 	drawCanvas();
 }
@@ -501,8 +503,36 @@ function keyDownTextField(e) {
 	switch(keyCode) {
 		case 32: // space
 			//init_time = (new Date()).getTime();
-			backgroundAudio.stop();
+			if (skip == false) {
+				enterSkip();
+			} else {
+				initAudio(function(){
+						skip = false;
+						init_time = (new Date()).getTime() - skip_timer;
+						backgroundAudio.start(0, skip_timer/1000);
+					});
+			}
 		break;
 	}
 
 }
+
+function enterSkip() {
+	skip_timer = (new Date()).getTime() - init_time;
+	backgroundAudio.stop();
+	backgroundAudio = undefined;
+	skip = true;
+}
+
+var skip = false;
+var skip_timer = 0;
+
+window.addEventListener("wheel", function(e) {
+    //var dir = Math.sign(e.deltaY);
+    //console.log(dir + ' ' + e.deltaY);
+	if (skip == false) {
+		enterSkip();
+	}
+	skip_timer += -e.deltaY;
+	if (skip_timer < 0) skip_timer = 0;
+});
