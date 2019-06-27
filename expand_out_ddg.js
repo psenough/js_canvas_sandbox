@@ -1,59 +1,18 @@
-var D = document;
+
+var sync_stuff = false;
 
 rand = function(n){
 	return 0|(Math.random()*n);
 };
 
+var D = document;
 D.title = 'expand out';
-
-PI = Math.PI;
-si = Math.sin;
-M = Math.max;
-N = Math.min;
-Q = Math.sqrt;
-
 var b = D.body;
 var Ms = b.style;
 Ms.margin='0px';
 var blackcolor = Ms.background = "#000";
 Ms.overflow = 'hidden';
-//var c = D.createElement('canvas');
-//b.appendChild(c);
-c = document.getElementById('c');
-
-
-//
-// request animation frame, from random place on the internet
-//
-
-(function() {
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
-                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
- 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = M(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
-        };
- 
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-}());
-
-
-
-var rms = 0;
+var c = document.getElementById('c');
 
 var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 //var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
@@ -68,9 +27,7 @@ var bufferLength;
 var dataArray;
 				
 function initAudio( cb ) {
-	    
 	var context;
-	
 	try {
 		// Fix up for prefixing
 		window.AudioContext = window.AudioContext||window.webkitAudioContext;
@@ -122,7 +79,6 @@ function initAudio( cb ) {
 		console.log(e);
 		//drawCanvas();
 	}
-
 }
 
 var img_ref_spring = [];
@@ -287,8 +243,10 @@ function drawCanvas() {
 		if (skip == true) timer = skip_timer;
 		 else timer = ((new Date()).getTime()-init_time);
 		if (timer < 200000) requestAnimationFrame( animate );
-		let dom = document.getElementById('timer');
-		if (dom) dom.innerText = timer;
+		if (sync_stuff == true) {
+			let dom = document.getElementById('timer');
+			if (dom) dom.innerText = timer;
+		}
 		ctx.clearRect(0,0,w,h);
 		ctx.globalAlpha = 1.0;
 		//console.log(avg);
@@ -326,10 +284,10 @@ function start() {
 		,{'inittime': 16000, 'initimg':  9, 'initx': -w*0.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.7, 'width': 350 }
 		,{'inittime': 20600, 'initimg': 13, 'initx': w*1.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.5, 'width': 300 }
 		,{'inittime': 24000, 'initimg': 19, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
-		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime': 28000, 'initimg': 15, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
 		,{'inittime': 32000, 'initimg': 16, 'initx': w*(0.4+Math.random()*0.2), 'inity': h*(0.4+Math.random()*0.2), 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 36000, 'initimg': 17, 'initx': w*(0.4+Math.random()*0.2), 'inity': h*(0.4+Math.random()*0.2), 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 40000, 'initimg': 18, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 40000, 'initimg':  1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 44000, 'initimg': 11, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48000, 'initimg': 20, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 48400, 'initimg': 21, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -357,8 +315,8 @@ function start() {
 		,{'inittime': 76200, 'initimg': 11, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 76500, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
-		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.55, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 84000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 80000, 'initimg': 13, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 84000, 'initimg': 14, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 86500, 'initimg': 15, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 88000, 'initimg':  1, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 88400, 'initimg':  2, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -372,15 +330,15 @@ function start() {
 		//,{'inittime': 96000, 'initimg':  1, 'initx': w*0.2, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 97000, 'initimg':  2, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime': 97500, 'initimg':  3, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime': 98000, 'initimg':  4, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime': 98000, 'initimg':  6, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':100000, 'initimg':  5, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
 		,{'inittime':101100, 'initimg':  8, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':101500, 'initimg':  9, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':102000, 'initimg': 10, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':104000, 'initimg': 11, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
-		,{'inittime':105100, 'initimg': 12, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':105500, 'initimg': 13, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':106000, 'initimg': 14, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':105100, 'initimg':  1, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':105500, 'initimg':  4, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':106000, 'initimg':  7, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':108000, 'initimg': 15, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
  		,{'inittime':109000, 'initimg': 19, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':109500, 'initimg': 20, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -388,7 +346,7 @@ function start() {
  		,{'inittime':112000, 'initimg': 22, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
  		,{'inittime':113000, 'initimg': 27, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':113500, 'initimg': 28, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
- 		,{'inittime':114000, 'initimg': 31, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':114000, 'initimg': 32, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
  		,{'inittime':115000, 'initimg': 29, 'initx': w*0.25, 'inity': h*0.25, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':115500, 'initimg': 30, 'initx': w*0.75, 'inity': h*0.75, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -396,8 +354,8 @@ function start() {
  		,{'inittime':117000, 'initimg':  5, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':117500, 'initimg':  6, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':118000, 'initimg':  7, 'initx': w*0.8, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
- 		,{'inittime':119000, 'initimg':  8, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
- 		,{'inittime':119500, 'initimg':  9, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':119000, 'initimg':  8, 'initx': w*0.6, 'inity': h*0.75, 'niter': 1, 'speed': 0.5, 'width': 50 }
+ 		,{'inittime':119500, 'initimg':  9, 'initx': w*0.4, 'inity': h*0.25, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':120000, 'initimg': 10, 'initx': w*0.2, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
  		,{'inittime':121000, 'initimg': 15, 'initx': w*0.4, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
  		,{'inittime':121500, 'initimg': 16, 'initx': w*0.6, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -422,7 +380,7 @@ function start() {
 
 		,{'inittime':139000, 'initimg': 7, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':139500, 'initimg': 8, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':140000, 'initimg': 9, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.3, 'width': 50 }
+		,{'inittime':140000, 'initimg': 9, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.3, 'width': 20 }
 
 		,{'inittime':143000, 'initimg': 11, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':143500, 'initimg': 12, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -457,7 +415,7 @@ function start() {
 		,{'inittime':163500, 'initimg': 13, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':164000, 'initimg': 14, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
 		,{'inittime':165000, 'initimg': 20, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':165500, 'initimg': 21, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':165500, 'initimg':  7, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':166000, 'initimg': 22, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':167000, 'initimg': 23, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':167500, 'initimg': 24, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
@@ -465,12 +423,12 @@ function start() {
 
 		,{'inittime':169000, 'initimg': 29, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':169500, 'initimg': 30, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
-		,{'inittime':170000, 'initimg': 31, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':170000, 'initimg':  0, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':171000, 'initimg': 32, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':171500, 'initimg': 33, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':172000, 'initimg': 1, 'initx': w*0.5, 'inity': h*0.5, 'niter': 3, 'speed': 0.5, 'width': 50 }
 		
-		,{'inittime':173000, 'initimg': 2, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
+		,{'inittime':173000, 'initimg': 7, 'initx': w*0.25, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':173500, 'initimg': 4, 'initx': w*0.75, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 		,{'inittime':174000, 'initimg': 6, 'initx': w*0.5, 'inity': h*0.5, 'niter': 1, 'speed': 0.5, 'width': 50 }
 
@@ -497,6 +455,7 @@ function start() {
 document.addEventListener("keydown", keyDownTextField, false);
 
 function keyDownTextField(e) {
+	if (sync_stuff == false) return;
 	var keyCode = e.keyCode;
 	console.log(keyCode);
 
@@ -528,6 +487,7 @@ var skip = false;
 var skip_timer = 0;
 
 window.addEventListener("wheel", function(e) {
+	if (sync_stuff == false) return;
     //var dir = Math.sign(e.deltaY);
     //console.log(dir + ' ' + e.deltaY);
 	if (skip == false) {
