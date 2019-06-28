@@ -1,5 +1,5 @@
 
-var sync_stuff = true;
+var sync_stuff = false;
 
 rand = function(n){
 	return 0|(Math.random()*n);
@@ -246,7 +246,11 @@ function drawCanvas() {
 		let timer;
 		if (skip == true) timer = skip_timer;
 		 else timer = ((new Date()).getTime()-init_time);
-		if (timer < 200000) requestAnimationFrame( animate );
+		if (timer < 196800) {
+			requestAnimationFrame( animate );
+		} else {
+			backToStartScreen();
+		}
 		if (sync_stuff == true) {
 			let dom = document.getElementById('timer');
 			if (dom) dom.innerText = timer;
@@ -275,11 +279,13 @@ function resize() {
 	ctx.height = h;
 }
 
+var wi = 25; // winter starting index
+
 function start() {
 	let dom = document.getElementById('starter_menu');
-	if (dom) dom.parentNode.removeChild(dom);
-	
-	var wi = 25;
+	if (dom) {//dom.parentNode.removeChild(dom);
+		dom.style.display = "none";
+	}
 	
 	resize();
 	scheduled_pings = [
@@ -456,6 +462,14 @@ function start() {
 	backgroundAudio.start(0, 0);
 	init_time = (new Date()).getTime();
 	drawCanvas();
+}
+
+function backToStartScreen(){
+	let dom = document.getElementById('starter_menu');
+	if (dom) {//dom.parentNode.removeChild(dom);
+		dom.style.display = "block";
+	}
+	initAudio(function(){});
 }
 
 document.addEventListener("keydown", keyDownTextField, false);
