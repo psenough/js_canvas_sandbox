@@ -217,25 +217,30 @@ function drawCanvas() {
 
 		for (let j=0; j<scheduled_pings.length; j++) {
 			let timed = timer-scheduled_pings[j]['inittime'];
-			let initimg = scheduled_pings[j]['initimg'];
-			let initx = scheduled_pings[j]['initx'];
-			let inity = scheduled_pings[j]['inity'];
-			let niter = scheduled_pings[j]['niter'];
-			let speed = scheduled_pings[j]['speed'];
-			let width = scheduled_pings[j]['width'];
-			ctx.save();
-			var im = initimg+niter; //img_ref.length;
-			for (var i=initimg; i<im; i++) {
-				ctx.beginPath();
-				var radius = -width*im + width*(im-i) + timed*0.5 + width*initimg;
-				//console.log(initx);
-				if (radius > 0) {
-					ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
-					ctx.clip();
-					ctx.drawImage(img_ref[i],0,0,w,h);
+			if ((timed > 0) && (timed < 9000)) {
+				let initimg = scheduled_pings[j]['initimg'];
+				let initx = scheduled_pings[j]['initx'];
+				let inity = scheduled_pings[j]['inity'];
+				let niter = scheduled_pings[j]['niter'];
+				let speed = scheduled_pings[j]['speed'];
+				let width = scheduled_pings[j]['width'];
+				ctx.save();
+				var im = initimg+niter; //img_ref.length;
+				for (var i=initimg; i<im; i++) {
+					ctx.beginPath();
+					var radius = -width*im + width*(im-i) + timed*0.5 + width*initimg;
+					//console.log(initx);
+					if (radius > 0) {
+						ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
+						ctx.clip();
+						//ctx.drawImage(img_ref[i],0,0,w,h);
+						var sx = 35.0+Math.sin(timer*0.0001)*35.0;
+						var sy = 35.0-Math.cos(timer*0.0001)*35.0;
+						ctx.drawImage(img_ref[i],sx,sy,img_ref[i].width-sx,img_ref[i].height-sy,-sx,-sy,w+sx*2,h+sy*2);
+					}
 				}
+				ctx.restore();
 			}
-			ctx.restore();
 		}
 		
 	}
