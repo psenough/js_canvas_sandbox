@@ -19,7 +19,7 @@ var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 //var is_opera = navigator.userAgent.indexOf("Presto") > -1;
 if ((is_chrome)&&(is_safari)) {is_safari=false;}
-
+/*
 var backgroundAudio;
 var analyser;
 var bufferLength;
@@ -57,7 +57,6 @@ function initAudio( cb ) {
 				dataArray = new Uint8Array(bufferLength);
 				analyser.getByteTimeDomainData(dataArray);
 				backgroundAudio.connect(analyser);
-				/*analyser.connect(context.destination);*/
 				
 				// start canvas
 				//drawCanvas();
@@ -79,11 +78,8 @@ function initAudio( cb ) {
 		//drawCanvas();
 	}
 }
-
-var img_ref_spring = [];
-var img_ref_winter = [];
-
-var img_ref_global = [];
+*/
+var img_ref_kol = [];
 
 function ImageLoader(Ref, ImgDir, Images, Callback){
     // Keep the count of the verified images
@@ -141,32 +137,21 @@ b.onload = function() {
 		console.log('my vignette is dark and long!');
 	}, false);
 	
-	ImageLoader(img_ref_spring, './gfx/spring3_ddg/', spring3_ddg, 
+	ImageLoader(img_ref_kol, './gfx/kol_214_copy_ddgart/', kol_214_copy_ddgart, 
 		function(result){
 			if(result.error.length != 0){
 				console.log("The following images couldn't be properly loaded: ", result.error);
 			}
+			
+			console.log('restul me');
+				
+			let dom = document.getElementById('btn');
+			if (dom) {
+				console.log('btn me');
+				dom.value = 'Start Demo!';
+				dom.disabled = false;
+			}
 
-			ImageLoader(img_ref_winter, './gfx/winter1_ddg/', winter1_ddg, 
-				function(result){
-					if(result.error.length != 0){
-						// outputs: ["example.png", "example.jpg"]
-						console.log("The following images couldn't be properly loaded: ", result.error);
-					}
-
-					img_ref_global = img_ref_spring.concat(img_ref_winter);
-					
-					// outputs: ["http://i.imgur.com/fHyEMsl.jpg"]
-					console.log("The following images were succesfully loaded: ", result.success);
-					//init();
-					initAudio( function(){
-						let dom = document.getElementById('btn');
-						if (dom) {
-							dom.value = 'Start Demo!';
-							dom.disabled = false;
-						}
-					} );
-			});
 	});
 	
 }
@@ -182,15 +167,41 @@ let scheduled_pings;
 
 let avg = 0.0;
 
+function rand(value) {
+	return Math.floor(Math.random()*value);
+}
+
+let particles = [];
+let num_particles = 300;
+
+function initParticles(){
+	for (let i=0;i<num_particles;i++){
+		particles[i] = {};
+		particles[i]['x'] = rand(w);
+		particles[i]['y'] = rand(h);
+		particles[i]['r'] = rand(60)+20;
+		particles[i]['vx'] = Math.random()*5.0-2.5;
+		particles[i]['vy'] = Math.random()*5.0-2.5;
+	}
+}
+
+function updateParticles(delta){
+	for (let i=0;i<num_particles;i++){
+		particles[i]['x'] = particles[i]['x'] + particles[i]['vx']*delta*0.025;
+		particles[i]['y'] = particles[i]['y'] + particles[i]['vy']*delta*0.025;		
+		if (particles[i]['x'] > w + particles[i]['r']) particles[i]['x'] = - particles[i]['r'];
+		if (particles[i]['x'] < - particles[i]['r']) particles[i]['x'] = w + particles[i]['r'];
+		if (particles[i]['y'] > h + particles[i]['r']) particles[i]['y'] = - particles[i]['r'];
+		if (particles[i]['y'] < - particles[i]['r']) particles[i]['y'] = h + particles[i]['r'];;
+	}
+}
+
 function drawCanvas() {
 
-	var num_nodes = 120;
-
-	var sync = 100;
-	var csync = 0;
-	var bsync = 0;
-
 	var bgcolor = 'rgba(0,0,0,1.0)';
+	
+	let timer = 0;
+	let prev_timer = 0;
 	
 	function drawSpectrum() {	
 		analyser.getByteTimeDomainData(dataArray);
@@ -209,8 +220,38 @@ function drawCanvas() {
 		}
 	}
 	
-	function drawPings(timer) {
-		let img_ref = img_ref_global;
+	function drawParticles() {
+		let img_ref = img_ref_kol;
+		let max = img_ref.length;
+		updateParticles(timer-prev_timer);
+		for (let j=0; j<scheduled_pings.length; j++) {
+			let timed = timer-scheduled_pings[j]['inittime'];
+			if ((timed > 0) && (timed < 9000)) {
+				let initimg = scheduled_pings[j]['initimg'];
+				
+				for (let i=0;i<num_particles;i++){
+					let idx = i%max;
+					let burst = 0;
+					if (initimg == idx) {
+						burst = 500-timed*0.5;
+						if (burst < 0) burst = 0;
+					}
+					ctx.beginPath();
+					ctx.arc(particles[i]['x']+5, particles[i]['y']+5, particles[i]['r']+burst, 0, 2 * Math.PI);
+					ctx.fill();
+					ctx.save();
+					ctx.beginPath();
+					ctx.arc(particles[i]['x'], particles[i]['y'], particles[i]['r']+burst, 0, 2 * Math.PI);
+					ctx.clip();
+					ctx.drawImage(img_ref[idx],0,0,img_ref[idx].width,img_ref[idx].height,0,0,w,h);
+					ctx.restore();
+				}
+			}
+		}
+	}
+	
+	function drawSquares(timer) {
+		let img_ref = img_ref_kol;
 		//if (timer < 96000) img_ref = img_ref_spring;
 		//	else img_ref = img_ref_winter;
 
@@ -226,16 +267,28 @@ function drawCanvas() {
 				ctx.save();
 				var im = initimg+niter; //img_ref.length;
 				for (var i=initimg; i<im; i++) {
-					ctx.beginPath();
-					var radius = -width*im + width*(im-i) + timed*0.5 + width*initimg;
+					
+					var radius = 50;
 					//console.log(initx);
 					if (radius > 0) {
-						ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
+						ctx.save();
+						ctx.translate(initx,inity);
+						ctx.rotate(timed*0.0001);
+						ctx.beginPath();
+						ctx.moveTo(-radius,-radius);
+						ctx.lineTo(radius,-radius);
+						ctx.lineTo(radius,radius);
+						ctx.lineTo(-radius,radius);
+						ctx.closePath();
+						//ctx.arc(initx, inity, radius, 0, 2 * Math.PI);
+						ctx.restore();
 						ctx.clip();
+						
 						//ctx.drawImage(img_ref[i],0,0,w,h);
 						var sx = 35.0+Math.sin(timer*0.0001)*35.0;
 						var sy = 35.0-Math.cos(timer*0.0001)*35.0;
 						ctx.drawImage(img_ref[i],sx,sy,img_ref[i].width-sx,img_ref[i].height-sy,-sx,-sy,w+sx*2,h+sy*2);
+						
 					}
 				}
 				ctx.restore();
@@ -247,14 +300,14 @@ function drawCanvas() {
 	requestAnimationFrame( animate );
 
 	function animate() {
-		let timer;
+		prev_timer = timer;
 		if (skip == true) timer = skip_timer;
 		 else timer = ((new Date()).getTime()-init_time);
-		if (timer < 196800) {
+		//if (timer < 196800) {
 			requestAnimationFrame( animate );
-		} else {
-			backToStartScreen();
-		}
+		//} else {
+		//	backToStartScreen();
+		//}
 		if (sync_stuff == true) {
 			let dom = document.getElementById('timer');
 			if (dom) dom.innerText = timer;
@@ -263,8 +316,8 @@ function drawCanvas() {
 		ctx.globalAlpha = 1.0;
 		//console.log(avg);
 		//ctx.drawImage(img_ref[1],0,0,w,h);
-		drawPings(timer);
-		drawSpectrum();
+		drawParticles(timer);
+		//drawSpectrum();
 		ctx.drawImage(vignette,0,0,w,h);
 	}
 }
@@ -292,6 +345,9 @@ function start() {
 	}
 	
 	resize();
+	
+	initParticles();
+
 	scheduled_pings = [
 		 {'inittime':     0, 'initimg':  0, 'initx': -w*0.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.7, 'width': 350 }
 		,{'inittime':  4600, 'initimg':  4, 'initx': w*1.05, 'inity': h*0.5, 'niter': 5, 'speed': 0.5, 'width': 300 }
@@ -463,7 +519,7 @@ function start() {
 		,{'inittime':192000, 'initimg': 21+wi, 'initx': w*0.5, 'inity': h*0.5, 'niter': 2, 'speed': 0.5, 'width': 80 }
 
 	];
-	backgroundAudio.start(0, 0);
+	//backgroundAudio.start(0, 0);
 	init_time = (new Date()).getTime();
 	drawCanvas();
 }
@@ -473,7 +529,7 @@ function backToStartScreen(){
 	if (dom) {//dom.parentNode.removeChild(dom);
 		dom.style.display = "block";
 	}
-	initAudio(function(){});
+	//initAudio(function(){});
 }
 
 document.addEventListener("keydown", keyDownTextField, false);
@@ -489,11 +545,11 @@ function keyDownTextField(e) {
 			if (skip == false) {
 				enterSkip();
 			} else {
-				initAudio(function(){
+				/*initAudio(function(){
 						skip = false;
 						init_time = (new Date()).getTime() - skip_timer;
 						backgroundAudio.start(0, skip_timer/1000);
-					});
+					});*/
 			}
 		break;
 	}
