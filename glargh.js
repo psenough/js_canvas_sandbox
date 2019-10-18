@@ -1,5 +1,5 @@
 
-var sync_stuff = true;
+var sync_stuff = false;
 
 rand = function(n){
 	return 0|(Math.random()*n);
@@ -388,9 +388,24 @@ function drawCanvas() {
 		}
 		ctx.clearRect(0,0,w,h);
 		ctx.globalAlpha = 1.0;
+		
+		//
 		drawThis(timer);
 		drawSpectrumGlargh(timer);
+		
+		// vignette
 		ctx.drawImage(vignette,0,0,w,h);
+		
+		// fader
+		var fader = 0.0;
+		// fadein
+		fader = 1.0 - timer/playtime*10.0;
+		if (fader < 0.0) fader = 0.0;
+		// fadeout
+		if (timer > playtime*0.9) fader = ((timer - playtime*0.9)/(playtime*0.1));
+		// draw fader layer
+		ctx.fillStyle = "rgba(0,0,0,"+fader+")";
+		ctx.fillRect(0, 0, w, h);
 	}
 }
 
