@@ -1,5 +1,5 @@
 
-var sync_stuff = false;
+var sync_stuff = true;
 
 rand = function(n){
 	return 0|(Math.random()*n);
@@ -36,8 +36,8 @@ function initAudio( cb ) {
 		var request = new XMLHttpRequest();
 		//if (is_safari) request.open('GET', 'esem_gre_ii.m4a', true);
 		//	else request.open('GET', 'esem_gre_ii.ogg', true);		
-		if (is_safari) request.open('GET', 'audio/himalayha_-_tao_perto_tao_longe.m4a', true);
-			else request.open('GET', 'audio/himalayha_-_tao_perto_tao_longe.ogg', true);
+		if (is_safari) request.open('GET', 'audio/psenough_190806_1min_edit.m4a', true);
+			else request.open('GET', 'audio/psenough_190806_1min_edit.ogg', true);
 		request.responseType = 'arraybuffer';
 		console.log('requesting');
 
@@ -53,7 +53,7 @@ function initAudio( cb ) {
 				
 				analyser = context.createAnalyser();
 				analyser.fftSize = 256;
-				bufferLength = analyser.fftSize;
+				bufferLength = analyser.frequencyBinCount;
 				dataArray = new Uint8Array(bufferLength);
 				analyser.getByteTimeDomainData(dataArray);
 				backgroundAudio.connect(analyser);
@@ -241,7 +241,7 @@ function drawCanvas() {
 		let idx = Math.floor(slider / vnum);	
 		//console.log(idx);
 		let inner = slider % vnum;
-		if (inner > 2) inner = Math.floor(inner/3);
+		if (inner > 2) inner = Math.floor(inner/2);
 		
 		let index = idx*vnum+inner;
 
@@ -258,20 +258,125 @@ function drawCanvas() {
 			ctx.translate(w, 0);
 			ctx.scale(-1, 1);
 		}
-
 		
 		var sx = 15.0+Math.sin(timer*0.0001)*15.0;
 		var sy = 15.0-Math.cos(timer*0.0001)*15.0;
 		ctx.drawImage(img_ref[index],sx,sy,img_ref[index].width-sx,img_ref[index].height-sy,-sx,-sy,w+sx*2,h+sy*2);
 		ctx.restore();
 	}
+	
+	var num = 140;
+	var angle = (Math.PI*2)/num;
+	var size = 120;
+	var opening, phase1, phase2;
+	function drawThis(timer) {
+
+		color = "rgba(20,120,200,0.1)";
+		ctx.fillStyle = color;
+		
+		phase1 = timer/10000;
+		phase2 = timer/3000;
+		
+		var posX = w*0.49;//*(0.5+Math.sin(phase2*0.1)*0.3);
+		var posY = h*0.49;//(0.5-Math.cos(phase2*0.2)*0.3);
+		//console.log(timer);
+		for (var i=0; i<num; i++) {
+			
+				opening = (w*0.4-(timer/playtime)*w*0.25)+Math.sin(i*angle)*50.0;
+				
+				//size = 40+Math.sin(timer/1000)*10+Math.sin(timer*(j-numy*.5)/1000)*10;
+				ctx.save();
+				ctx.translate( posX+Math.sin(i*angle+phase1)*opening, posY+Math.cos(i*angle+phase1)*opening );
+				ctx.rotate(i*angle+Math.sin(phase2+Math.sin(i*angle)));
+				ctx.beginPath();
+				ctx.moveTo(-size*.5,-size*.5);
+				ctx.lineTo(0,size);
+				ctx.lineTo(size*.5,-size*.5);
+				//ctx.lineTo(size*.5,size/2*Math.sqrt(3));
+				ctx.fill();
+				ctx.closePath();
+				ctx.restore();
+				
+				opening = (w*0.6-(timer/playtime)*w*0.25)+Math.sin(i*angle)*50.0;
+				
+				//size = 40+Math.sin(timer/1000)*10+Math.sin(timer*(j-numy*.5)/1000)*10;
+				ctx.save();
+				ctx.translate( posX+Math.sin(i*angle+phase1)*opening, posY+Math.cos(i*angle+phase1)*opening );
+				ctx.rotate(i*angle+Math.sin(phase2+Math.sin(i*angle)));
+				ctx.beginPath();
+				ctx.moveTo(-size*.5,-size*.5);
+				ctx.lineTo(0,size);
+				ctx.lineTo(size*.5,-size*.5);
+				//ctx.lineTo(size*.5,size/2*Math.sqrt(3));
+				ctx.fill();
+				ctx.closePath();
+				ctx.restore();
+		}
+		
+	}
+	
+	function drawSpectrumGlargh(timer) {
+		
+		analyser.getByteTimeDomainData(dataArray);
+		let wb = w / bufferLength;	
+		for(let i = 0; i < bufferLength; i++) {
+			let v = dataArray[i] / bufferLength;
+			let d = (1.0+Math.sin(v*20.0))*v*10.0;			
+			//color = "rgba(255,255,255,"+v*0.25+")";
+			ctx.save();
+			//ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(i*wb-d,0);
+			ctx.lineTo(i*wb+wb+d,0);
+			ctx.lineTo(i*wb+wb+d,h);
+			ctx.lineTo(i*wb-d,h);
+			//ctx.fill();
+			ctx.closePath();
+			ctx.clip();
+
+			let vnum = 9;
+			let slider = timer % img_ref.length;
+			//console.log(slider);
+			let idx = Math.floor(slider / vnum);	
+			//console.log(idx);
+			let inner = slider % vnum;
+			if (inner > d*0.3) inner = Math.floor(inner/3);
+			
+			let index = idx*vnum+inner;
+
+			ctx.save();
+			/*let subs1 = 2000;
+			let subdiv1 = timer % subs1;
+			if (subdiv1 < subs1/2) {
+				ctx.translate(0, h);
+				ctx.scale(1, -1);
+			}
+			let subs2 = 4000;
+			let subdiv2 = timer % subs2;
+			if (subdiv2 < subs2/2) {
+				ctx.translate(w, 0);
+				ctx.scale(-1, 1);
+			}*/
+			
+			var sx = 0.0;// 15.0+Math.sin(timer*0.0001)*15.0;
+			var sy = 0.0;// 15.0-Math.cos(timer*0.0001)*15.0;
+			ctx.globalAlpha = 0.25;
+			ctx.drawImage(img_ref[index],sx,sy,img_ref[index].width-sx,img_ref[index].height-sy,-sx,-sy,w+sx*2,h+sy*2);
+			ctx.restore();
+			
+			ctx.restore();
+		}
+		
+		
+	}
+	
 	requestAnimationFrame( animate );
 
 	function animate() {
 		let timer;
 		if (skip == true) timer = skip_timer;
 		 else timer = ((new Date()).getTime()-init_time);
-		if (timer < 196800) {
+		if (timer < playtime) {
 			requestAnimationFrame( animate );
 		} else {
 			backToStartScreen();
@@ -279,17 +384,17 @@ function drawCanvas() {
 		if (sync_stuff == true) {
 			let dom = document.getElementById('timer');
 			if (dom) dom.innerText = timer;
+			//console.log(timer);
 		}
 		ctx.clearRect(0,0,w,h);
 		ctx.globalAlpha = 1.0;
-		//console.log(avg);
-		//ctx.drawImage(img_ref[1],0,0,w,h);
-		//drawPings(timer);
-		//drawSpectrum();
-		drawGlargh(timer);
+		drawThis(timer);
+		drawSpectrumGlargh(timer);
 		ctx.drawImage(vignette,0,0,w,h);
 	}
 }
+
+let playtime = 60000;
 
 window.onresize = resize;
 
