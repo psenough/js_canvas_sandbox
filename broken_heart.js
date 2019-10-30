@@ -198,149 +198,14 @@ function drawCanvas() {
 				if (timed > timedout*0.8) fader = 1.0 - ((timed - timedout*0.8)/(timedout*0.2));
 				if (fader > 1.0) fader = 1.0;
 				ctx.globalAlpha = fader*0.5;
-				var sx = 35.0+Math.sin(timer*0.0001)*35.0;
-				var sy = 35.0-Math.cos(timer*0.0001)*35.0;
+				var sx = 20.0+Math.sin(timer*0.0001)*20.0;
+				var sy = 20.0-Math.cos(timer*0.0001)*20.0;
 				ctx.drawImage(img_ref[initimg],sx,sy,img_ref[initimg].width-sx,img_ref[initimg].height-sy,-sx,-sy,w+sx*2,h+sy*2);
 				//ctx.drawImage(img_ref[initimg],0,0,w,h);
 			}
 		}
 	}
-	
-	function drawGlargh(timer) {
-		let vnum = 9;
-		let slider = timer % img_ref.length;
-		//console.log(slider);
-		let idx = Math.floor(slider / vnum);	
-		//console.log(idx);
-		let inner = slider % vnum;
-		if (inner > 2) inner = Math.floor(inner/2);
-		
-		let index = idx*vnum+inner;
 
-		ctx.save();
-		let subs1 = 2000;
-		let subdiv1 = timer % subs1;
-		if (subdiv1 < subs1/2) {
-			ctx.translate(0, h);
-			ctx.scale(1, -1);
-		}
-		let subs2 = 4000;
-		let subdiv2 = timer % subs2;
-		if (subdiv2 < subs2/2) {
-			ctx.translate(w, 0);
-			ctx.scale(-1, 1);
-		}
-		
-		var sx = 15.0+Math.sin(timer*0.0001)*15.0;
-		var sy = 15.0-Math.cos(timer*0.0001)*15.0;
-		ctx.drawImage(img_ref[index],sx,sy,img_ref[index].width-sx,img_ref[index].height-sy,-sx,-sy,w+sx*2,h+sy*2);
-		ctx.restore();
-	}
-	
-	/*var num = 140;
-	var angle = (Math.PI*2)/num;
-	var size = 120;
-	var opening, phase1, phase2;
-	function drawThis(timer) {
-
-		color = "rgba(20,120,200,0.1)";
-		ctx.fillStyle = color;
-		
-		phase1 = timer/10000;
-		phase2 = timer/3000;
-		
-		var posX = w*0.49;//*(0.5+Math.sin(phase2*0.1)*0.3);
-		var posY = h*0.49;//(0.5-Math.cos(phase2*0.2)*0.3);
-		//console.log(timer);
-		for (var i=0; i<num; i++) {
-			
-				opening = (w*0.4-(timer/playtime)*w*0.25)+Math.sin(i*angle)*50.0;
-				
-				//size = 40+Math.sin(timer/1000)*10+Math.sin(timer*(j-numy*.5)/1000)*10;
-				ctx.save();
-				ctx.translate( posX+Math.sin(i*angle+phase1)*opening, posY+Math.cos(i*angle+phase1)*opening );
-				ctx.rotate(i*angle+Math.sin(phase2+Math.sin(i*angle)));
-				ctx.beginPath();
-				ctx.moveTo(-size*.5,-size*.5);
-				ctx.lineTo(0,size);
-				ctx.lineTo(size*.5,-size*.5);
-				//ctx.lineTo(size*.5,size/2*Math.sqrt(3));
-				ctx.fill();
-				ctx.closePath();
-				ctx.restore();
-				
-				opening = (w*0.6-(timer/playtime)*w*0.25)+Math.sin(i*angle)*50.0;
-				
-				//size = 40+Math.sin(timer/1000)*10+Math.sin(timer*(j-numy*.5)/1000)*10;
-				ctx.save();
-				ctx.translate( posX+Math.sin(i*angle+phase1)*opening, posY+Math.cos(i*angle+phase1)*opening );
-				ctx.rotate(i*angle+Math.sin(phase2+Math.sin(i*angle)));
-				ctx.beginPath();
-				ctx.moveTo(-size*.5,-size*.5);
-				ctx.lineTo(0,size);
-				ctx.lineTo(size*.5,-size*.5);
-				//ctx.lineTo(size*.5,size/2*Math.sqrt(3));
-				ctx.fill();
-				ctx.closePath();
-				ctx.restore();
-		}
-		
-	}*/
-	
-	function drawSpectrumGlargh(timer) {
-		
-		analyser.getByteTimeDomainData(dataArray);
-		let wb = w / bufferLength;	
-		for(let i = 0; i < bufferLength; i++) {
-			let v = dataArray[i] / bufferLength;
-			let d = (1.0+Math.sin(v*20.0))*v*10.0;			
-			//color = "rgba(255,255,255,"+v*0.25+")";
-			ctx.save();
-			//ctx.fillStyle = color;
-			ctx.beginPath();
-			ctx.moveTo(i*wb-d,0);
-			ctx.lineTo(i*wb+wb+d,0);
-			ctx.lineTo(i*wb+wb+d,h);
-			ctx.lineTo(i*wb-d,h);
-			//ctx.fill();
-			ctx.closePath();
-			ctx.clip();
-
-			let vnum = 9;
-			let slider = timer % img_ref.length;
-			//console.log(slider);
-			let idx = Math.floor(slider / vnum);	
-			//console.log(idx);
-			let inner = slider % vnum;
-			if (inner > d*0.3) inner = Math.floor(inner/3);
-			
-			let index = idx*vnum+inner;
-
-			ctx.save();
-			/*let subs1 = 2000;
-			let subdiv1 = timer % subs1;
-			if (subdiv1 < subs1/2) {
-				ctx.translate(0, h);
-				ctx.scale(1, -1);
-			}
-			let subs2 = 4000;
-			let subdiv2 = timer % subs2;
-			if (subdiv2 < subs2/2) {
-				ctx.translate(w, 0);
-				ctx.scale(-1, 1);
-			}*/
-			
-			var sx = 0.0;// 15.0+Math.sin(timer*0.0001)*15.0;
-			var sy = 0.0;// 15.0-Math.cos(timer*0.0001)*15.0;
-			ctx.globalAlpha = 0.25;
-			ctx.drawImage(img_ref[index],sx,sy,img_ref[index].width-sx,img_ref[index].height-sy,-sx,-sy,w+sx*2,h+sy*2);
-			ctx.restore();
-			
-			ctx.restore();
-		}
-	
-	}
-	
 	function drawThanos(timer) {
 		
 		analyser.getByteTimeDomainData(dataArray);
@@ -360,30 +225,10 @@ function drawCanvas() {
 			ctx.closePath();
 			ctx.clip();
 
-			//let vnum = 9;
 			let slider = timer % img_ref.length;
-			//console.log(slider);
-			//let idx = Math.floor(slider / vnum);	
-			//console.log(idx);
-			//let inner = slider % vnum;
-			//if (inner > d*0.3) inner = Math.floor(inner/3);
-			
 			let index = slider; //idx*vnum+inner;
 
 			ctx.save();
-			/*let subs1 = 2000;
-			let subdiv1 = timer % subs1;
-			if (subdiv1 < subs1/2) {
-				ctx.translate(0, h);
-				ctx.scale(1, -1);
-			}
-			let subs2 = 4000;
-			let subdiv2 = timer % subs2;
-			if (subdiv2 < subs2/2) {
-				ctx.translate(w, 0);
-				ctx.scale(-1, 1);
-			}*/
-			
 			var sx = 0.0;// 15.0+Math.sin(timer*0.0001)*15.0;
 			var sy = 0.0;// 15.0-Math.cos(timer*0.0001)*15.0;
 			//ctx.globalAlpha = 0.25;
@@ -393,7 +238,70 @@ function drawCanvas() {
 			ctx.restore();
 		}
 		
+	}
+	
+	function drawSpyralFlare(timer) {
+
+		let size = 60;
+		let num = 45;
+		let angle = (Math.PI*2)/num;		
+		let phase1 = timer/125000;
+		let phase2 = timer/15000;
+
+		let posX = w*(0.5);
+		let posY = h*(0.5);
 		
+		ctx.strokeStyle = "rgba(170,180,250,0.8)";
+		//ctx.lineJoin = "round";
+		
+		for (var j=0; j<9; j++) {
+		
+			var thisb = parseInt((Math.sin(phase2*0.25 + j)+1.0)*5, 10);
+
+			for (var i=0; i<num; i++) {			
+					var opening = Math.sin(i*angle)*30 + j*100;
+					ctx.lineWidth = parseInt((Math.random()*5)+1,10);
+					size = 40+Math.sin(timer/1000)*10;
+					ctx.save();
+					ctx.translate( posX+Math.sin(i*angle+phase1)*opening, posY+Math.cos(i*angle+phase1)*opening );
+					ctx.rotate(i*angle+Math.sin(phase2+Math.sin(i*angle))*4);
+					ctx.beginPath();
+					ctx.moveTo(-size*.5*j,-size*.5*j);
+					ctx.lineTo(0,size);
+					ctx.lineTo(size*.5*j,-size*.5*j);
+					ctx.lineTo(size*.5,size*.5);
+					
+					ctx.closePath();
+					ctx.stroke();
+					ctx.restore();
+			}
+		}
+		
+	}
+	
+	let subtitle_cache = '';
+	
+	function updateSubtitles(timer) {
+		let scheduled_pings = scheduled_subtitles;
+		let thistext = '';
+		for (let j=0; j<scheduled_pings.length; j++) {
+			let timed = timer-scheduled_pings[j]['inittime'];
+			if ((timed > 0) && (timer < scheduled_pings[j]['endtime'])) {
+				thistext = scheduled_pings[j]['text'];
+			}
+		}
+		if (thistext != subtitle_cache) {
+			let dom = document.getElementById('subtitle-text');
+			if (dom) {
+				if (thistext == '') {
+					dom.style.display = 'none';
+				} else {
+					dom.style.display = 'inline';
+					dom.innerHTML = thistext;
+					subtitle_cache = thistext;
+				}
+			}
+		}
 	}
 	
 	requestAnimationFrame( animate );
@@ -414,7 +322,9 @@ function drawCanvas() {
 		}
 		ctx.clearRect(0,0,w,h);
 		
-		ctx.globalAlpha = 1.0;
+		drawSpyralFlare(timer);		
+		
+		ctx.globalAlpha = 0.75;
 		drawSyncBackground(timer);
 		
 		ctx.globalAlpha = 0.2;
@@ -438,6 +348,8 @@ function drawCanvas() {
 		// draw fader layer
 		ctx.fillStyle = "rgba(0,0,0,"+fader+")";
 		ctx.fillRect(0, 0, w, h);
+		
+		updateSubtitles(timer);
 	}
 }
 
@@ -475,7 +387,6 @@ function start() {
 		 ,{'inittime': 18700, 'initimg': 13, 'endtime': 19800}
 		 ,{'inittime': 19800, 'initimg':  9, 'endtime': 20400}
 		 ,{'inittime': 20400, 'initimg': 10, 'endtime': 51250}
-		 ,{'inittime': 51250, 'initimg':  0, 'endtime': 53000}
 		 ,{'inittime': 53000, 'initimg': 10, 'endtime': 64180}
 		 ,{'inittime': 64180, 'initimg': 14, 'endtime': 65260}
 		 ,{'inittime': 65260, 'initimg': 15, 'endtime': 65900}
@@ -484,26 +395,55 @@ function start() {
 		 ,{'inittime':140000, 'initimg': 12, 'endtime':142000}
 		 ,{'inittime':144000, 'initimg': 13, 'endtime':144800}
 		 ,{'inittime':146500, 'initimg':  9, 'endtime':168000}
-		 ,{'inittime':168000, 'initimg': 22, 'endtime':268000}
-
 	];
 	scheduled_overlays = [
 		  {'inittime': 41500, 'initimg': 11, 'endtime': 46000} 
-		 //,{'inittime': 51250, 'initimg':  0, 'endtime': 53000} //meh
+		 ,{'inittime': 51250, 'initimg':  0, 'endtime': 53000}
 		 ,{'inittime': 57000, 'initimg':  8, 'endtime': 62150}
-		 ,{'inittime': 71650, 'initimg': 11, 'endtime': 75000}
-		 ,{'inittime': 93000, 'initimg':  5, 'endtime':102000}
-		 ,{'inittime': 96000, 'initimg':  6, 'endtime':102000}
-		 ,{'inittime':102000, 'initimg': 19, 'endtime':106000}
-		 ,{'inittime':110000, 'initimg':  5, 'endtime':117000}
-		 ,{'inittime':115000, 'initimg':  6, 'endtime':117000}
+		 ,{'inittime': 71650, 'initimg': 11, 'endtime': 78000}
+		 ,{'inittime': 93000, 'initimg':  5, 'endtime':103000}
+		 ,{'inittime': 96000, 'initimg': 11, 'endtime':103000}
+		 ,{'inittime':102000, 'initimg': 19, 'endtime':107000}
+		 ,{'inittime':110000, 'initimg': 28, 'endtime':118000}
+		 ,{'inittime':114000, 'initimg': 11, 'endtime':119000}
 		 ,{'inittime':117000, 'initimg': 21, 'endtime':124000}
-		 ,{'inittime':133000, 'initimg': 22, 'endtime':140000}
-		 //,{'inittime':117000, 'initimg': 21, 'endtime':124000}
-
+		 ,{'inittime':132000, 'initimg':  3, 'endtime':145000}
+		 ,{'inittime':150000, 'initimg': 24, 'endtime':163000}
+		 ,{'inittime':157000, 'initimg': 25, 'endtime':163000}
+		 ,{'inittime':168000, 'initimg':  8, 'endtime':180000}
+		 ,{'inittime':180000, 'initimg': 23, 'endtime':210000}
+		 ,{'inittime':200000, 'initimg': 26, 'endtime':230000}
+		 ,{'inittime':220000, 'initimg': 27, 'endtime':250000}
 	];
-	
-	//30000 boids start crawling
+	scheduled_subtitles = [
+		  {'inittime':     0, 'endtime':  5700, 'text':'*silence*'} 
+		 ,{'inittime':  5700, 'endtime': 41500, 'text':'*static noise*'} 
+		 //,{'inittime': 15000, 'endtime': 21000, 'text':'*weird crackling*'}
+		 //,{'inittime': 21000, 'endtime': 41500, 'text':'*static noise*'} 
+		 ,{'inittime': 41500, 'endtime': 46000, 'text':'*synth pads*'} 
+		 //,{'inittime': 46000, 'endtime': 51000, 'text':'*static noise*'} 
+		 ,{'inittime': 51000, 'endtime': 53000, 'text':'*mechanical animal growling*'} 
+		 //,{'inittime': 53000, 'endtime': 57000, 'text':'*static noise*'} 
+		 ,{'inittime': 57000, 'endtime': 62000, 'text':'*synth pads*'} 
+		 ,{'inittime': 70000, 'endtime': 72000, 'text':'*dogs barking*'} 
+		 //,{'inittime': 74000, 'endtime': 80000, 'text':'*static noise*'} 
+		 ,{'inittime': 72000, 'endtime': 78000, 'text':'*synth pads*'} 
+		 ,{'inittime': 83200, 'endtime': 86000, 'text':'*computer mouse clicking*'} 
+
+		 ,{'inittime':100000, 'endtime':110000, 'text':'and then we were on another plane'} 
+		 ,{'inittime':110000, 'endtime':120000, 'text':'with a strict realization, a sense of fulfillment'} 
+		 ,{'inittime':120000, 'endtime':130000, 'text':'we saw a morphed path form itself in front of us'} 
+		 ,{'inittime':130000, 'endtime':140000, 'text':'and there was no shame'} 
+		 ,{'inittime':140000, 'endtime':150000, 'text':'no caution'} 
+		 ,{'inittime':150000, 'endtime':160000, 'text':'no suspicion of any sort or kind'} 
+		 ,{'inittime':160000, 'endtime':170000, 'text':'we could be ourselves again'} 
+		 ,{'inittime':170000, 'endtime':180000, 'text':'i spent the whole day wandering those open fields'} 
+		 ,{'inittime':180000, 'endtime':190000, 'text':'until i found myself'} 
+		 ,{'inittime':190000, 'endtime':200000, 'text':'i found our revelation, our purpose'} 
+		 ,{'inittime':200000, 'endtime':210000, 'text':'that last broken heart piece'} 
+		 ,{'inittime':210000, 'endtime':220000, 'text':'hidden well deep underneath your soul'} 
+		 ,{'inittime':220000, 'endtime':230000, 'text':'i see him smile now'} 
+	];
 	
 	//subtitles "static signal " "dogs barking" "notes playing"
 	
