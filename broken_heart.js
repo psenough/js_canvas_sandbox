@@ -1,5 +1,5 @@
 
-var sync_stuff = true;
+var sync_stuff = false;
 
 rand = function(n){
 	return 0|(Math.random()*n);
@@ -291,7 +291,7 @@ function drawCanvas() {
 			}
 		}
 		if (thistext != subtitle_cache) {
-			let dom = document.getElementById('subtitle-text');
+			let dom = document.getElementById('subtitles-text');
 			if (dom) {
 				if (thistext == '') {
 					dom.style.display = 'none';
@@ -430,21 +430,21 @@ function start() {
 		 ,{'inittime': 72000, 'endtime': 78000, 'text':'*synth pads*'} 
 		 ,{'inittime': 83200, 'endtime': 86000, 'text':'*computer mouse clicking*'} 
 
-		 ,{'inittime':100000, 'endtime':110000, 'text':'and then we were on another plane'} 
-		 ,{'inittime':110000, 'endtime':120000, 'text':'with a strict realization, a sense of fulfillment'} 
-		 ,{'inittime':120000, 'endtime':130000, 'text':'we saw a morphed path form itself in front of us'} 
-		 ,{'inittime':130000, 'endtime':140000, 'text':'and there was no shame'} 
-		 ,{'inittime':140000, 'endtime':150000, 'text':'no caution'} 
-		 ,{'inittime':150000, 'endtime':160000, 'text':'no suspicion of any sort or kind'} 
-		 ,{'inittime':160000, 'endtime':170000, 'text':'we could be ourselves again'} 
-		 ,{'inittime':170000, 'endtime':180000, 'text':'i spent the whole day wandering those open fields'} 
-		 ,{'inittime':180000, 'endtime':190000, 'text':'until i found myself'} 
-		 ,{'inittime':190000, 'endtime':200000, 'text':'i found our revelation, our purpose'} 
-		 ,{'inittime':200000, 'endtime':210000, 'text':'that last broken heart piece'} 
-		 ,{'inittime':210000, 'endtime':220000, 'text':'hidden well deep underneath your soul'} 
-		 ,{'inittime':220000, 'endtime':230000, 'text':'i see him smile now'} 
+		 ,{'inittime':100000, 'endtime':110000, 'text':'and then we were on another plane'}
+		 ,{'inittime':110000, 'endtime':120000, 'text':'with a strict realization, a sense of fulfillment'}
+		 ,{'inittime':120000, 'endtime':130000, 'text':'the dust smelled of lavender soap'}
+		 ,{'inittime':130000, 'endtime':140000, 'text':'a morphed path formed itself in front of us'}
+		 ,{'inittime':140000, 'endtime':150000, 'text':'there was a glow and there was no shame'}
+		 ,{'inittime':150000, 'endtime':160000, 'text':'no caution, no suspicion of any sort or kind'}
+		 ,{'inittime':160000, 'endtime':170000, 'text':'and we could be ourselves again'}
+		 ,{'inittime':170000, 'endtime':180000, 'text':'i spent that whole day wandering the open fields'}
+		 ,{'inittime':180000, 'endtime':190000, 'text':'until i found it at the edge of an oasis'}
+		 ,{'inittime':190000, 'endtime':200000, 'text':'our revelation, our purpose'}
+		 ,{'inittime':200000, 'endtime':210000, 'text':'hidden well deep underneath your soul'}
+		 ,{'inittime':210000, 'endtime':220000, 'text':'that last broken heart piece, that is now fading...'}
+		 ,{'inittime':220000, 'endtime':230000, 'text':'he is smiling at me'}
 	];
-	
+
 	//subtitles "static signal " "dogs barking" "notes playing"
 	
 	backgroundAudio.start(0, 0);
