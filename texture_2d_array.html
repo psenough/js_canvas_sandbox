@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>texture_2d_array tests</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+document, body {
+	padding: 0px;
+	margin: 0px;
+	overflow: hidden;
+}
+*:focus {
+	outline: none;
+}
+a:link, a:visited, a:hover, a:active {
+  color: gray;
+}
+#btn {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#btn:disabled {
+  background-color: grey;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+#starter_menu {
+	color: white;
+	text-align: center;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	margin-top: 5em;
+	width: 100%;
+}
+#timer {
+	position: absolute;
+	top: 0px;
+	color:white;
+	left: 0px;
+}
+	</style>
+</head>
+
+<body>
+    <!-- WebGL 2 shaders -->
+    <script id="vs" type="x-shader/x-vertex">
+        #version 300 es
+        #define POSITION_LOCATION 0
+        #define TEXCOORD_LOCATION 4
+        
+        precision highp float;
+        precision highp int;
+
+        uniform mat4 MVP;
+
+        layout(location = POSITION_LOCATION) in vec2 position;
+        layout(location = TEXCOORD_LOCATION) in vec2 texcoord;
+
+        out vec2 v_st;
+
+        void main()
+        {
+            v_st = texcoord;
+            gl_Position = MVP * vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script id="fs" type="x-shader/x-fragment">
+        #version 300 es
+        precision highp float;
+        precision highp int;
+        precision highp sampler2DArray;
+
+        uniform sampler2DArray diffuse;
+        uniform int layer;
+        uniform float u_timer;
+
+        in vec2 v_st;
+
+        out vec4 color;
+		float iTime;
+		vec2 uv;
+		float PI = 3.14159265359;
+
+
+        void main()
+        {
+		
+			iTime = u_timer*0.00025;	
+			uv = vec2(v_st.xy-0.5)*2.0;
+			//uv.x *= v_resolution.x/v_resolution.y;
+			uv *= 0.5;
+			uv = vec2(uv.x*cos(iTime)-uv.y*sin(iTime), uv.x*sin(iTime)+uv.y*cos(iTime));
+
+			float r = length(uv);			
+			float sum = 0.0;
+			iTime = u_timer*0.00005;
+			for(int i = 0 ; i < 16; i++)
+			{
+				if(i < 16+int(sin(iTime)*16.0))
+				{
+					float theta1 = (5.0*atan(uv.y, uv.x)-r*PI*4.0*cos(float(i)+iTime))+ cos(iTime);
+					float awesome = pow(clamp(1.0-acos(cos(theta1)), 0.0, 1.0), PI);
+					sum += awesome;
+				}
+			}
+
+			vec3 fragColor;
+			fragColor.r = cos(sum*1.0+cos(iTime*1.0)*2.0)*.5+.5;
+			fragColor.g = cos(sum*1.0+cos(iTime*2.0))*.5+.5;
+			fragColor.b = cos(sum*1.0+cos(iTime*3.0))*.5+.5;
+			
+			float shortest_dist = 0.0;
+			float second_shortest_dist = 0.0;
+			int shortest_idx = 1;
+			vec4 shortest_idx_v = vec4(0.0);
+			vec4 second_shortest_idx_v = vec4(0.0);
+			
+			vec4 color0 = vec4(fragColor,1.0);
+			
+			// get all texture colors at this position
+			vec4 mixedv = color0;
+			vec4 col[11];
+			float dist[11];
+			for (int i=0; i < dist.length(); i++) {
+				col[i] = texture(diffuse, vec3(v_st, i));
+				dist[i] = distance(color0,col[i]);
+				mixedv = mix(mixedv, col[i], sin(iTime*100.0+float(i+layer))*0.5+0.5);
+			}
+			
+			// calculate their distances (in color) to the background effect 
+			float td = distance(color0,col[0]);
+			shortest_dist = td;
+			second_shortest_dist = td;
+			for (int i=0; i < dist.length(); i++) {
+				td = dist[i];
+				if (td <= shortest_dist) {
+					shortest_idx = i;
+					second_shortest_dist = shortest_dist;
+					second_shortest_idx_v = col[i];
+					shortest_idx_v = col[i];
+				} else if (td <= second_shortest_dist) {
+					second_shortest_dist = td;
+					second_shortest_idx_v = col[i];
+				}
+			}
+
+			if ( distance( vec4(0.,0.,0.,1.0), color0 ) < 0.35) color0 = mixedv;
+			else color0 = col[(shortest_idx+layer) % 11];
+			
+			//color0 = mix(shortest_idx_v,mixedv, sin(iTime)*0.5+0.5);
+			
+			//color0 = mixedv;
+			
+			//color0 = clamp(color0,0.0,1.0);
+		
+            color = color0; //texture(diffuse, vec3(v_st, layer));
+        }
+    </script>
+
+    <script src="utility.js"></script>
+    <script src="utility2.js"></script>
+
+    <script>
+ 
+		let init_time = 0;
+		let loop = undefined;
+		let skip = false;
+		let sync_stuff = false;
+
+		var textures = [];
+		var tcount = 0;
+
+		function checkLoad(){
+		tcount++;
+		//console.log('tcount: ' + tcount + ' ' + textures.length);
+		if (tcount == textures.length) {
+			//initAudio( function(){
+					let dom = document.getElementById('btn');
+					if (dom) {
+						dom.value = 'Start Demo!';
+						dom.disabled = false;
+					}
+			//});
+		}
+		}
+
+		//tpolm_ddg = ['1e0c88b198acac03dd2a5e5579a5e156a741486f.jpg','2336ad678515897d65ca3ffcb3fc72123dbc36a2.jpg','2af253c5dcee82b8251bd85956ed1c0bfce13922.jpg','8a5545dac0eb8b8f00d8280b3f831c348b8e01f9.jpg','99b9b160a70a17ed8a65ca9400859b86bb123530.jpg','9ca2308f1feccefe988d398ccda3cc4bf44f4cfc.jpg','ab429dd46af87444de96ab72576d49be9512a43f.jpg','acaf62959cfc5e3ee0acca078751dea376798bd1.jpg','c23f04c43b7508383f1afb661055e344bdd51497.jpg','e99b7185fef47dd8eddbe6011ca7be91874260c7.jpg'];
+
+		document.body.onload = function() {
+			textures[0] = loadImage('gfx/tpolm_2d_array_test.png', function(ti){ console.log(ti); checkLoad(); });
+			/*textures[1] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/2336ad678515897d65ca3ffcb3fc72123dbc36a2.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[2] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/2af253c5dcee82b8251bd85956ed1c0bfce13922.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[3] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/8a5545dac0eb8b8f00d8280b3f831c348b8e01f9.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[4] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/99b9b160a70a17ed8a65ca9400859b86bb123530.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[5] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/9ca2308f1feccefe988d398ccda3cc4bf44f4cfc.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[6] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/ab429dd46af87444de96ab72576d49be9512a43f.jpg', function(ti){ console.log(ti); checkLoad(); });
+			textures[7] = loadImageAndCreateTextureInfo('gfx/tpolm_ddg/c23f04c43b7508383f1afb661055e344bdd51497.jpg', function(ti){ console.log(ti); checkLoad(); });*/
+		}
+		
+		function start() {
+			let dom = document.getElementById('starter_menu');
+			if (dom) {
+				dom.style.display = "none";
+			}
+
+			//resize();
+			
+			//backgroundAudio.start(0, 0);
+			init_time = (new Date()).getTime();
+			drawCanvas();
+		}
+
+		let playtime = 10*60*1000+51970;
+
+		window.onresize = resize;
+
+		function resize() {
+			w = window.innerWidth;
+			h = window.innerHeight;
+			c.setAttribute("width", w);
+			c.setAttribute("height", h);
+			if (gl!= undefined) gl.viewport(0, 0, w, h);
+		}
+		
+		let program = undefined;
+		let gl = undefined;
+		let layerLocation = undefined;
+		let timerLocation = undefined;
+		
+		// https://www.peko-step.com/en/tool/combine-images.html
+		var NUM_IMAGES = 11;
+		var IMAGE_SIZE = {
+			width: 640,
+			height: 400
+		};
+		
+		function initShaderProgramQuad() {
+			var canvas = document.getElementById('c');
+			canvas.height = window.innerHeight;
+			canvas.width = canvas.height * 640 / 400;
+			//document.body.appendChild(canvas);
+
+			gl = canvas.getContext( 'webgl2', { antialias: false } );
+			var isWebGL2 = !!gl;
+			if(!isWebGL2) {
+				document.getElementById('info').innerHTML = 'WebGL 2 is not available.  See <a href="https://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">How to get a WebGL 2 implementation</a>';
+				return;
+			}
+			
+			resize();
+
+			// -- Init program
+			program = createProgram(gl, getShaderSource('vs'), getShaderSource('fs'));
+			var mvpLocation = gl.getUniformLocation(program, 'MVP');
+			var diffuseLocation = gl.getUniformLocation(program, 'diffuse');
+			layerLocation = gl.getUniformLocation(program, 'layer');
+			timerLocation = gl.getUniformLocation(program, 'u_timer');
+
+
+			// -- Init buffers
+			var positions = new Float32Array([
+				-1.0, -1.0,
+				 1.0, -1.0,
+				 1.0,  1.0,
+				 1.0,  1.0,
+				-1.0,  1.0,
+				-1.0, -1.0
+			]);
+			var vertexPosBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexPosBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+			var texCoords = new Float32Array([
+				0.0, 1.0,
+				1.0, 1.0,
+				1.0, 0.0,
+				1.0, 0.0,
+				0.0, 0.0,
+				0.0, 1.0
+			]);
+			var vertexTexBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+			// -- Init VertexArray
+			var vertexArray = gl.createVertexArray();
+			gl.bindVertexArray(vertexArray);
+
+			var vertexPosLocation = 0; // set with GLSL layout qualifier
+			gl.enableVertexAttribArray(vertexPosLocation);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexPosBuffer);
+			gl.vertexAttribPointer(vertexPosLocation, 2, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+			var vertexTexLocation = 4; // set with GLSL layout qualifier
+			gl.enableVertexAttribArray(vertexTexLocation);
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexBuffer);
+			gl.vertexAttribPointer(vertexTexLocation, 2, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+			gl.bindVertexArray(null);
+			
+			var texture = gl.createTexture();
+			let image = textures[0];
+			//loadImage('gfx/tpolm_2d_array_test.png', function(image){
+
+				// use canvas to get the pixel data array of the image
+				var canvas = document.createElement('canvas');
+				canvas.width = IMAGE_SIZE.width;
+				canvas.height = IMAGE_SIZE.height * NUM_IMAGES;
+				var ctx = canvas.getContext('2d');
+				ctx.drawImage(image, 0, 0);
+				var imageData = ctx.getImageData(0, 0, IMAGE_SIZE.width, IMAGE_SIZE.height * NUM_IMAGES);
+				var pixels = new Uint8Array(imageData.data.buffer);
+				
+				// -- Init Texture
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+				gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+				gl.texImage3D(
+					gl.TEXTURE_2D_ARRAY,
+					0,
+					gl.RGBA,
+					IMAGE_SIZE.width,
+					IMAGE_SIZE.height,
+					NUM_IMAGES,
+					0,
+					gl.RGBA,
+					gl.UNSIGNED_BYTE,
+					pixels
+				);
+				
+				gl.useProgram(program);
+				gl.bindVertexArray(vertexArray);
+				
+				var matrix = new Float32Array([
+					1.0, 0.0, 0.0, 0.0,
+					0.0, 1.0, 0.0, 0.0,
+					0.0, 0.0, 1.0, 0.0,
+					0.0, 0.0, 0.0, 1.0
+				]);
+				gl.uniformMatrix4fv(mvpLocation, false, matrix);
+				gl.uniform1i(diffuseLocation, 0);
+				
+				
+			//});
+		}
+        
+		function drawCanvas() {
+
+			shaderProgramQuad = initShaderProgramQuad();
+	
+			let d = new Date();
+			let n = d.getTime();
+			
+			let prevtime = n;
+			(loop = function() {
+				if (loop != undefined) {
+			
+				let timer, frame;
+				if (skip == true) timer = skip_timer;
+				 else timer = ((new Date()).getTime()-init_time);
+				if (timer < playtime) {
+					requestAnimationFrame( loop );
+				} else {
+					backToStartScreen();
+				}
+				if (sync_stuff == true) {
+					let dom = document.getElementById('timer');
+					if (dom) dom.innerText = timer;
+					//console.log(timer);
+				}
+				frame = (timer*0.0005) % NUM_IMAGES;
+				//console.log(frame);
+			
+				// -- Render
+				gl.clearColor(1.0, 1.0, 1.0, 1.0);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+				gl.uniform1i(layerLocation, frame);
+				gl.uniform1f(timerLocation, timer);
+				
+				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			
+				}
+			})();
+			
+		}
+
+		
+        // If you have a long-running page, and need to delete WebGL resources, use:
+        //
+        // gl.deleteBuffer(vertexPosBuffer);
+        // gl.deleteBuffer(vertexTexBuffer);
+        // gl.deleteTexture(texture);
+        // gl.deleteProgram(program);
+        // gl.deleteVertexArray(vertexArray);
+
+
+    </script>
+	
+	<div id="starter_menu">
+			<br />
+			<input id="btn" type="button" value="Loading..." disabled onclick="start()"/>
+			<br />
+			<br />		
+	</div>
+	<canvas id="c"></canvas>
+	<span id="timer"></span>
+</body>
+
+</html>
